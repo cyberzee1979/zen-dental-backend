@@ -1,0 +1,1601 @@
+<!DOCTYPE html>
+<html lang="sq">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Paneli i Mjekëve | Zen Dental</title>
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 448 512'><path fill='%2310b981' d='M418.8 496.2c-15.1 9.4-34.6 4.6-43.2-10.7L288 340l-87.6 145.5c-8.6 15.3-28.1 20-43.2 10.7S134.4 466 143 450.7L209 341.2c-6.8-9.4-12.3-19.8-16.2-31l-38.6-113c-2.4-7-6.2-13.6-11.2-19.3-12.8-14.7-31.5-22.6-51-21.6-32.2 1.6-59 27.6-59 60.1V288c0 17.7-14.3 32-32 32s-32-14.3-32-32v-71.6C1 149.7 54.1 95 120.5 91.1c39.6-2.4 76.5 17 97.4 51.5C238.8 108.1 275.7 88.7 315.3 91.1c66.4 3.9 119.5 58.6 119.5 125.3V288c0 17.7-14.3 32-32 32s-32-14.3-32-32V216.4c0-32.5-26.8-58.5-59-60.1-19.5-1-38.2 6.9-51 21.6-5 5.7-8.8 12.3-11.2 19.3l-38.6 113c-3.9 11.2-9.4 21.6-16.2 31L360 450.7c8.6 15.3 3.8 34.8-11.2 45.5z'/></svg>">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body { font-family: 'Inter', sans-serif; background-color: #f3f4f6; }
+        @media print {
+            body * { visibility: hidden !important; }
+            #zonaRaportit, #zonaRaportit *, #zonaBlerjevePrint, #zonaBlerjevePrint * { visibility: visible !important; }
+            #zonaRaportit, #zonaBlerjevePrint { position: absolute !important; left: 0 !important; top: 0 !important; width: 100% !important; margin: 0 !important; padding: 20px !important; border: none !important; box-shadow: none !important; background: white !important; display: block !important; }
+            .no-print, button { display: none !important; }
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col bg-gray-100">
+
+    <nav class="bg-gray-800 text-white shadow-md no-print">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16">
+                <div class="flex items-center cursor-pointer" onclick="ndrroTabin('rezervime')">
+                    <img src="uploads/ZenDentalLogo.jpg" alt="Zen Dental Logo" class="h-10 w-auto bg-white p-1 rounded">
+                </div>
+                <div class="flex items-center space-x-3">
+                    <button id="navStafi" onclick="ndrroTabin('stafi')" class="hidden text-sm bg-purple-600 hover:bg-purple-700 px-3 py-1.5 rounded transition shadow-sm">
+                        <i class="fa-solid fa-users-gear mr-1"></i> <span class="hidden sm:inline">Menaxho Stafin</span>
+                    </button>
+                    <button id="btnDil" onclick="dil()" class="hidden text-sm bg-red-600 hover:bg-red-700 px-3 py-1.5 rounded transition shadow-sm">
+                        <i class="fa-solid fa-sign-out-alt mr-1"></i> Dil
+                    </button>
+                    <a href="index.html" class="text-sm text-gray-300 hover:text-white">
+                        <i class="fa-solid fa-arrow-left mr-1"></i> <span class="hidden sm:inline">Kthehu te Sajti</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div id="loginSection" class="flex-grow flex items-center justify-center p-4">
+        <div class="max-w-md w-full bg-white rounded-xl shadow-md p-8 border border-gray-100">
+            <div class="text-center mb-8">
+                <div class="inline-block p-4 rounded-full bg-blue-50 mb-4"><i class="fa-solid fa-user-shield text-4xl text-blue-600"></i></div>
+                <h2 class="text-2xl font-bold text-gray-900">Portali i Stafit</h2>
+                <p class="text-gray-500 text-sm mt-1">Identifikohuni me llogarinë tuaj.</p>
+            </div>
+            
+            <form id="loginForm" onsubmit="kryejKycjen(event)" class="space-y-5">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Përdoruesi (Username)</label>
+                    <input type="text" id="username" required autocomplete="username" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none transition bg-gray-50">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Fjalëkalimi</label>
+                    <input type="password" id="password" required autocomplete="current-password" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none transition bg-gray-50">
+                </div>
+                <div id="loginError" class="hidden text-red-600 text-sm bg-red-50 p-3 rounded-lg border flex items-center"><i class="fa-solid fa-circle-exclamation mr-2"></i> Kredenciale të gabuara ose serveri nuk është ndezur!</div>
+                <button type="submit" class="w-full bg-gray-800 hover:bg-gray-900 text-white font-medium py-3 rounded-lg transition shadow-lg mt-2">Kyçu</button>
+            </form>
+        </div>
+    </div>
+
+    <main id="dashboardSection" class="hidden flex-grow max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 py-8">
+        <div class="bg-white rounded-xl shadow-sm p-6 border border-gray-200">
+            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 border-b pb-4 no-print">
+                <div>
+                    <h1 class="text-2xl font-semibold text-gray-800">Paneli i Kontrollit</h1>
+                    <p id="mjekuTitulli" class="text-blue-600 font-medium text-sm mt-1">Duke ngarkuar...</p>
+                </div>
+                <div class="mt-4 sm:mt-0 flex space-x-2 overflow-x-auto pb-2 sm:pb-0 w-full sm:w-auto">
+                    <button onclick="ndrroTabin('rezervime')" id="tabRezervime" class="whitespace-nowrap px-4 py-2 bg-gray-800 text-white rounded-lg text-sm font-medium transition">Terminet Aktive</button>
+                    <button onclick="ndrroTabin('arkiva')" id="tabArkiva" class="whitespace-nowrap px-4 py-2 bg-gray-100 text-gray-700 hover:bg-gray-200 rounded-lg text-sm font-medium transition">Arkiva</button>
+                    
+                    <button onclick="ndrroTabin('shpenzimet')" id="btnMenuShpenzimet" class="hidden whitespace-nowrap px-4 py-2 bg-gray-100 text-gray-700 hover:bg-gray-200 rounded-lg text-sm font-medium transition"><i class="fa-solid fa-cart-shopping mr-1 text-orange-500"></i> Blerjet</button>
+                    
+                    <button onclick="ndrroTabin('galeria')" id="tabGaleria" class="whitespace-nowrap px-4 py-2 bg-gray-100 text-gray-700 hover:bg-gray-200 rounded-lg text-sm font-medium transition"><i class="fa-solid fa-images mr-1"></i> Galeria</button>
+                    <button onclick="ndrroTabin('vleresime')" id="tabVleresime" class="whitespace-nowrap px-4 py-2 bg-gray-100 text-gray-700 hover:bg-gray-200 rounded-lg text-sm font-medium transition"><i class="fa-solid fa-star mr-1 text-yellow-500"></i> Vlerësimet</button>
+                    <button onclick="ndrroTabin('smile')" id="tabSmile" class="whitespace-nowrap px-4 py-2 bg-gray-100 text-gray-700 hover:bg-gray-200 rounded-lg text-sm font-medium transition"><i class="fa-solid fa-wand-magic-sparkles mr-1 text-purple-500"></i> Smile Assess.</button>
+                    <button onclick="ndrroTabin('raportet')" id="tabRaportet" class="whitespace-nowrap px-4 py-2 bg-gray-100 text-gray-700 hover:bg-gray-200 rounded-lg text-sm font-medium transition"><i class="fa-solid fa-chart-line mr-1"></i> Raportet</button>
+                </div>
+            </div>
+
+            <div id="searchContainer" class="mb-6 relative no-print hidden">
+                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none"><i class="fa-solid fa-search text-gray-400 text-lg"></i></div>
+                <input type="text" id="fushaKerkimit" autocomplete="off" name="kerko_pacient_arkive" oninput="kerkoPacientin()" placeholder="Kërko me emër, mbiemër ose numër telefoni..." class="block w-full pl-10 pr-3 py-3 border border-gray-300 rounded-lg bg-gray-50 focus:bg-white focus:ring-2 focus:ring-blue-500 sm:text-sm transition shadow-sm">
+            </div>
+
+            <!-- MODULI I TERMINEVE -->
+            <div id="seksioniRezervimeve" class="no-print">
+                <div class="mb-4 flex flex-col sm:flex-row justify-between items-start sm:items-center bg-white p-4 rounded-xl border border-gray-200 shadow-sm">
+                    <div class="mb-3 sm:mb-0">
+                        <h2 class="text-lg font-bold text-gray-900">Lista e Termineve</h2>
+                        <p class="text-sm text-gray-500">Menaxhoni pacientët në pritje.</p>
+                    </div>
+                    <button onclick="hapModalinShtoPacient()" class="bg-green-600 hover:bg-green-700 text-white px-5 py-2.5 rounded-lg text-sm font-bold shadow-md transition flex items-center w-full sm:w-auto justify-center">
+                        <i class="fa-solid fa-user-plus mr-2"></i> Shto Pacient (Walk-in)
+                    </button>
+                </div>
+                
+                <div class="overflow-x-auto">
+                    <table class="min-w-full divide-y divide-gray-200 border rounded-lg">
+                        <thead class="bg-gray-50">
+                            <tr>
+                                <th class="px-6 py-3 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">Pacienti</th>
+                                <th class="px-6 py-3 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">Kontakti</th>
+                                <th class="px-6 py-3 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">Shërbimi</th>
+                                <th class="px-6 py-3 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">Data & Ora</th>
+                                <th class="px-6 py-3 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">Mjeku</th>
+                                <th class="px-6 py-3 text-right text-xs font-bold text-gray-700 uppercase tracking-wider">Veprime</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tabelaRezervimeve" class="bg-white divide-y divide-gray-200">
+                            <tr><td colspan="6" class="px-6 py-10 text-center text-gray-500">Duke ngarkuar...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- MODULI I BLERJEVE -->
+            <div id="seksioniShpenzimeve" class="hidden no-print">
+                <div class="mb-6 pb-4 border-b border-gray-200 flex justify-between items-center">
+                    <div>
+                        <h2 class="text-xl font-bold text-gray-900"><i class="fa-solid fa-cart-shopping text-orange-600 mr-2"></i>Blerjet e Materialeve / Pajisjeve</h2>
+                        <p class="text-sm text-gray-500 mt-1">Regjistro blerjet, ndaji sipas muajit dhe printo pasqyrën.</p>
+                    </div>
+                    <button onclick="printoBlerjet()" class="bg-orange-600 hover:bg-orange-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition shadow-sm flex items-center">
+                        <i class="fa-solid fa-file-pdf mr-2"></i> Printo Blerjet / PDF
+                    </button>
+                </div>
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                    <div class="lg:col-span-1 bg-gray-50 p-6 rounded-xl border">
+                        <h3 class="text-lg font-bold text-gray-900 mb-4">Shto Blerje të Re</h3>
+                        <form id="formaShpenzimit" onsubmit="shtoShpenzim(event)" class="space-y-4">
+                            <div>
+                                <label class="block text-xs font-bold text-gray-700 mb-1">Pajisja / Materiali</label>
+                                <input type="text" id="shpMateriali" placeholder="psh. Kompozit, Doreza, Etj" required class="w-full px-3 py-2 border rounded-lg bg-white outline-none focus:ring-2 focus:ring-orange-400">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-gray-700 mb-1">Kompania / Furnizuesi</label>
+                                <input type="text" id="shpKompania" placeholder="psh. Dental Depot Shpk" required class="w-full px-3 py-2 border rounded-lg bg-white outline-none focus:ring-2 focus:ring-orange-400">
+                            </div>
+                            <div class="bg-orange-50 p-3 rounded-lg border border-orange-100">
+                                <label class="block text-xs font-bold text-orange-800 mb-1">Kostoja e faturës (EUR)</label>
+                                <input type="number" id="shpCmimi" min="0" step="0.5" required placeholder="0.0" class="w-full px-3 py-2 border border-orange-300 rounded-lg outline-none font-bold text-lg text-gray-900">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-gray-700 mb-1">Data e Faturës</label>
+                                <input type="date" id="shpData" required class="w-full px-3 py-2 border rounded-lg bg-white outline-none focus:ring-2 focus:ring-orange-400">
+                            </div>
+                            <button type="submit" id="btnShtoShpenzim" class="w-full bg-orange-600 hover:bg-orange-700 text-white font-bold py-3 rounded-lg transition mt-4 shadow-sm"><i class="fa-solid fa-plus mr-1"></i> Regjistro Faturën</button>
+                        </form>
+                    </div>
+                    <div class="lg:col-span-2">
+                        <div class="flex justify-between items-center mb-4 bg-white p-3 rounded-lg border shadow-sm">
+                            <h4 class="font-bold text-gray-800 text-sm">Faturat e Regjistruara</h4>
+                            <div class="flex items-center space-x-2">
+                                <label class="text-xs font-bold text-gray-600">Filtro Muajin:</label>
+                                <select id="filtruShpenzimeveMuaji" onchange="ngarkoShpenzimet()" class="px-3 py-1.5 border rounded-lg text-sm bg-gray-50 outline-none">
+                                    <option value="all">I gjithë Viti</option>
+                                    <option value="01">Janar</option>
+                                    <option value="02">Shkurt</option>
+                                    <option value="03">Mars</option>
+                                    <option value="04">Prill</option>
+                                    <option value="05">Maj</option>
+                                    <option value="06">Qershor</option>
+                                    <option value="07">Korrik</option>
+                                    <option value="08">Gusht</option>
+                                    <option value="09">Shtator</option>
+                                    <option value="10">Tetor</option>
+                                    <option value="11">Nëntor</option>
+                                    <option value="12">Dhjetor</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="overflow-x-auto">
+                            <table class="min-w-full divide-y divide-gray-200 border rounded-lg">
+                                <thead class="bg-gray-50">
+                                    <tr>
+                                        <th class="px-4 py-3 text-left text-xs font-bold text-gray-700 uppercase">Artikulli / Kompania</th>
+                                        <th class="px-4 py-3 text-left text-xs font-bold text-gray-700 uppercase">Data</th>
+                                        <th class="px-4 py-3 text-left text-xs font-bold text-gray-700 uppercase">Kostoja</th>
+                                        <th class="px-4 py-3 text-right text-xs font-bold text-gray-700 uppercase">Veprime</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="tabelaShpenzimeve" class="bg-white divide-y divide-gray-200">
+                                    <tr><td colspan="4" class="px-6 py-10 text-center text-gray-500">Duke ngarkuar shpenzimet...</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="mt-4 text-right p-3 bg-orange-50 rounded-lg border border-orange-100 flex justify-between items-center">
+                            <span class="font-bold text-gray-700 text-sm">Totali i Shpenzimeve për këtë periudhë:</span>
+                            <span class="text-xl font-extrabold text-orange-700" id="totaliShpenzimeveStat">0 €</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ZONA E DEDIKUAR PËR PRINTIMIN E BLERJEVE (E fshehur në ekran, e dukshme vetëm në letër) -->
+            <div id="zonaBlerjevePrint" class="hidden bg-white p-8 rounded-xl border">
+                <div class="text-center mb-8 border-b pb-4">
+                    <h1 class="text-2xl font-bold text-gray-900"><i class="fa-solid fa-tooth text-green-500"></i> Zen Dental - Raporti i Blerjeve</h1>
+                    <p class="text-gray-500 mt-1" id="titulliBlerjevePrintPDF">Pasqyra e Materialeve</p>
+                </div>
+                <table class="min-w-full divide-y divide-gray-200 border">
+                    <thead class="bg-gray-50">
+                        <tr>
+                            <th class="px-4 py-2 text-left text-xs font-bold text-gray-700 uppercase">Artikulli / Kompania</th>
+                            <th class="px-4 py-2 text-left text-xs font-bold text-gray-700 uppercase">Data</th>
+                            <th class="px-4 py-2 text-right text-xs font-bold text-gray-700 uppercase">Kostoja</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tabelaBlerjevePrint" class="bg-white divide-y divide-gray-200">
+                    </tbody>
+                </table>
+                <div class="mt-6 text-right p-3 bg-orange-50 rounded-lg border border-orange-100 flex justify-between items-center">
+                    <span class="font-bold text-gray-700 text-sm">Totali i Shpenzimeve:</span>
+                    <span class="text-xl font-extrabold text-orange-700" id="totaliBlerjevePrintStat">0 €</span>
+                </div>
+            </div>
+
+            <!-- MODULI I ARKIVES -->
+            <div id="seksioniArkiva" class="hidden overflow-x-auto no-print">
+                <table class="min-w-full divide-y divide-gray-200">
+                    <thead class="bg-gray-50">
+                        <tr>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Pacienti & Mjeku</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Procedura & Data</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Çmimi Paguar</th>
+                            <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Veprime</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tabelaArkiva" class="bg-white divide-y divide-gray-200">
+                        <tr><td colspan="4" class="px-6 py-10 text-center text-gray-500">Duke ngarkuar...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- MODULI I VLERESIMEVE -->
+            <div id="seksioniVleresimeve" class="hidden no-print">
+                <div class="mb-6 pb-4 border-b border-gray-200 flex justify-between items-center">
+                    <div>
+                        <h2 class="text-xl font-bold text-gray-900"><i class="fa-solid fa-star text-yellow-500 mr-2"></i>Menaxhimi i Vlerësimeve</h2>
+                        <p class="text-sm text-gray-500 mt-1">Aprovoni, fshihni ose fshini vlerësimet e pacientëve përpara se të dalin në faqen publike.</p>
+                    </div>
+                </div>
+                <div id="listaVleresimeveAdmin" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <div class="col-span-full py-10 text-center text-gray-500"><i class="fa-solid fa-spinner fa-spin text-xl mb-2"></i><br>Duke ngarkuar vlerësimet...</div>
+                </div>
+            </div>
+
+            <!-- MODULI SMILE ASSESSMENT -->
+            <div id="seksioniSmile" class="hidden no-print">
+                <div class="mb-6 pb-4 border-b border-gray-200 flex justify-between items-center">
+                    <div>
+                        <h2 class="text-xl font-bold text-gray-900"><i class="fa-solid fa-wand-magic-sparkles text-purple-600 mr-2"></i>Kërkesat "Smile Assessment"</h2>
+                        <p class="text-sm text-gray-500 mt-1">Shqyrtoni fotot dhe kërkesat e pacientëve që dëshirojnë të përmirësojnë buzëqeshjen e tyre.</p>
+                    </div>
+                </div>
+                <div id="listaSmileAdmin" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <div class="col-span-full py-10 text-center text-gray-500"><i class="fa-solid fa-spinner fa-spin text-xl mb-2"></i><br>Duke ngarkuar kërkesat...</div>
+                </div>
+            </div>
+
+            <!-- MODULI I RAPORTEVE -->
+            <div id="seksioniRaporteve" class="hidden">
+                <div class="mb-6 pb-4 border-b border-gray-200 flex justify-between items-center no-print">
+                    <div>
+                        <h2 class="text-xl font-bold text-gray-900"><i class="fa-solid fa-file-invoice-dollar text-green-600 mr-2"></i>Raportet Financiare & Fitimi Neto</h2>
+                        <p class="text-sm text-gray-500 mt-1">Gjeneroni pasqyrën e të hyrave nga pacientët dhe zbritni shpenzimet e materialeve.</p>
+                    </div>
+                    <button onclick="eksportoPDF()" class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition shadow-sm flex items-center">
+                        <i class="fa-solid fa-file-pdf mr-2"></i> Printo / PDF
+                    </button>
+                </div>
+
+                <div class="bg-gray-50 p-4 rounded-xl border border-gray-200 mb-6 flex flex-wrap gap-4 items-end no-print">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Filtro Muajin</label>
+                        <select id="raportiMuaji" class="px-4 py-2 border border-gray-300 rounded-lg outline-none focus:border-blue-500 bg-white">
+                            <option value="all">I gjithë Viti</option>
+                            <option value="01">Janar</option>
+                            <option value="02">Shkurt</option>
+                            <option value="03">Mars</option>
+                            <option value="04">Prill</option>
+                            <option value="05">Maj</option>
+                            <option value="06">Qershor</option>
+                            <option value="07">Korrik</option>
+                            <option value="08">Gusht</option>
+                            <option value="09">Shtator</option>
+                            <option value="10">Tetor</option>
+                            <option value="11">Nëntor</option>
+                            <option value="12">Dhjetor</option>
+                        </select>
+                    </div>
+                    <button onclick="gjeneroRaportin()" class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg text-sm font-medium transition shadow-sm">
+                        Kalkulo Raportin
+                    </button>
+                </div>
+
+                <div id="zonaRaportit" class="bg-white border border-gray-200 rounded-xl p-8 relative">
+                    <div class="hidden print:block mb-8 text-center border-b pb-4">
+                        <h1 class="text-2xl font-bold text-gray-900"><i class="fa-solid fa-tooth text-green-500"></i> Zen Dental - Raporti Financiar</h1>
+                        <p class="text-gray-500 mt-1" id="titulliRaportitPDF"></p>
+                    </div>
+
+                    <div class="flex justify-between items-end mb-4">
+                        <h3 class="text-lg font-bold text-gray-800" id="raportiTitulli">Përmbledhja</h3>
+                    </div>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                        <div class="bg-green-50 p-5 rounded-xl border border-green-200 flex flex-col justify-center">
+                            <h4 class="text-green-800 text-xs font-bold uppercase mb-1 flex items-center"><i class="fa-solid fa-arrow-trend-up mr-1"></i> Të Hyrat (Pacientët)</h4>
+                            <p class="text-3xl font-extrabold text-green-700" id="statTëArdhurat">0 €</p>
+                        </div>
+                        <div id="statShpenzimetContainer" class="bg-orange-50 p-5 rounded-xl border border-orange-200 flex flex-col justify-center hidden">
+                            <h4 class="text-orange-800 text-xs font-bold uppercase mb-1 flex items-center"><i class="fa-solid fa-arrow-trend-down mr-1"></i> Shpenzimet (Materiale)</h4>
+                            <p class="text-3xl font-extrabold text-orange-700" id="statShpenzimet">0 €</p>
+                        </div>
+                        <div id="statFitimiContainer" class="bg-blue-50 p-5 rounded-xl border border-blue-200 flex flex-col justify-center hidden">
+                            <h4 class="text-blue-800 text-xs font-bold uppercase mb-1 flex items-center"><i class="fa-solid fa-scale-balanced mr-1"></i> Fitimi Neto (ROI)</h4>
+                            <p class="text-4xl font-black text-blue-700" id="statFitimi">0 €</p>
+                        </div>
+                    </div>
+
+                    <div class="mt-8">
+                        <h4 class="font-bold text-gray-900 mb-4 border-b pb-2">Lista e të Hyrave (Terminet)</h4>
+                        <table class="min-w-full divide-y divide-gray-200 border">
+                            <thead class="bg-gray-50">
+                                <tr>
+                                    <th class="px-4 py-2 text-left text-xs font-bold text-gray-700 uppercase">Data</th>
+                                    <th class="px-4 py-2 text-left text-xs font-bold text-gray-700 uppercase">Pacienti</th>
+                                    <th class="px-4 py-2 text-left text-xs font-bold text-gray-700 uppercase bg-blue-50">Mjeku</th>
+                                    <th class="px-4 py-2 text-left text-xs font-bold text-gray-700 uppercase">Procedura & Shënimet</th>
+                                    <th class="px-4 py-2 text-right text-xs font-bold text-gray-700 uppercase">Shuma</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tabelaRaportitDetajuar" class="bg-white divide-y divide-gray-200">
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    <div id="raportiShpenzimetContainer" class="mt-8 hidden">
+                        <h4 class="font-bold text-gray-900 mb-4 border-b pb-2 text-orange-700">Lista e Shpenzimeve (Faturat)</h4>
+                        <table class="min-w-full divide-y divide-gray-200 border">
+                            <thead class="bg-orange-50">
+                                <tr>
+                                    <th class="px-4 py-2 text-left text-xs font-bold text-gray-700 uppercase">Data</th>
+                                    <th class="px-4 py-2 text-left text-xs font-bold text-gray-700 uppercase">Materiali / Pajisja</th>
+                                    <th class="px-4 py-2 text-left text-xs font-bold text-gray-700 uppercase">Furnizuesi</th>
+                                    <th class="px-4 py-2 text-right text-xs font-bold text-gray-700 uppercase">Kostoja</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tabelaRaportitShpenzimeve" class="bg-white divide-y divide-gray-200">
+                            </tbody>
+                        </table>
+                    </div>
+
+                </div>
+            </div>
+
+            <!-- MODULI I GALERISE -->
+            <div id="seksioniGaleria" class="hidden no-print">
+                <div class="mb-6 pb-4 border-b border-gray-200">
+                    <h2 class="text-xl font-bold text-gray-900"><i class="fa-solid fa-images text-blue-600 mr-2"></i>Menaxhimi i Galerisë</h2>
+                </div>
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                    <div class="lg:col-span-1 bg-gray-50 p-6 rounded-xl border">
+                        <h3 class="text-lg font-bold text-gray-900 mb-4">Shto Rast të Ri</h3>
+                        <form id="formaGaleria" onsubmit="shtoGaleri(event)" class="space-y-4">
+                            <div>
+                                <label class="block text-xs font-bold text-gray-700 mb-1">Titulli i Rastit</label>
+                                <input type="text" id="galeriTitulli" placeholder="psh. Faseta E-max" required class="w-full px-3 py-2 border rounded-lg bg-white">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-gray-700 mb-1">Përshkrimi i shkurtër</label>
+                                <textarea id="galeriPershkrimi" placeholder="Detajet e ndërhyrjes..." required rows="3" class="w-full px-3 py-2 border rounded-lg bg-white"></textarea>
+                            </div>
+                            <div class="bg-red-50 p-3 rounded-lg border border-red-100">
+                                <label class="block text-xs font-bold text-red-800 mb-1"><i class="fa-solid fa-image"></i> Foto "Para" (Detyrueshme)</label>
+                                <input type="file" id="galeriFotoPara" accept="image/*" required class="w-full text-sm bg-white border p-2 rounded-lg">
+                            </div>
+                            <div class="bg-green-50 p-3 rounded-lg border border-green-100">
+                                <label class="block text-xs font-bold text-green-800 mb-1"><i class="fa-solid fa-image"></i> Foto "Pas" (Detyrueshme)</label>
+                                <input type="file" id="galeriFotoPas" accept="image/*" required class="w-full text-sm bg-white border p-2 rounded-lg">
+                            </div>
+                            
+                            <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-lg transition mt-4 shadow-sm"><i class="fa-solid fa-cloud-arrow-up mr-2"></i> Ngarko Rastin</button>
+                        </form>
+                    </div>
+                    <div class="lg:col-span-2">
+                        <div id="listaGaleriaAdmin" class="grid grid-cols-1 md:grid-cols-2 gap-4">Duke ngarkuar galerinë...</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- MODULI I STAFIT -->
+            <div id="seksioniStafit" class="hidden no-print">
+                <div class="mb-6 pb-4 border-b border-gray-200">
+                    <h2 class="text-xl font-bold text-gray-900"><i class="fa-solid fa-users-gear text-purple-600 mr-2"></i>Menaxhimi i Stafit</h2>
+                </div>
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                    <div class="lg:col-span-1 bg-gray-50 p-6 rounded-xl border">
+                        <h3 class="text-lg font-bold text-gray-900 mb-4">Shto Anëtar të Ri</h3>
+                        <form id="formaStafit" onsubmit="shtoStaf(event)" class="space-y-4">
+                            <input type="text" id="stafEmri" placeholder="Emri Mbiemri" required class="w-full px-3 py-2 border rounded-lg">
+                            <input type="text" id="stafRoli" placeholder="Roli (Kirurg, Ortodont etj)" required class="w-full px-3 py-2 border rounded-lg">
+                            <textarea id="stafPershkrimi" placeholder="Përshkrimi / CV e shkurtër" required rows="3" class="w-full px-3 py-2 border rounded-lg"></textarea>
+                            
+                            <div class="grid grid-cols-2 gap-2 border-t border-gray-200 pt-4 mt-2">
+                                <div>
+                                    <label class="block text-xs font-bold text-gray-700 mb-1">Username</label>
+                                    <input type="text" id="stafUsername" autocomplete="off" placeholder="psh. dr.agon" required class="w-full px-3 py-2 border rounded-lg bg-white">
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-bold text-gray-700 mb-1">Fjalëkalimi</label>
+                                    <input type="password" id="stafPassword" autocomplete="new-password" placeholder="***" required class="w-full px-3 py-2 border rounded-lg bg-white">
+                                </div>
+                            </div>
+                            
+                            <label class="block text-xs font-bold text-gray-700 mt-2">Fotoja (Opsionale)</label>
+                            <input type="file" id="stafFoto" accept="image/*" class="w-full text-sm bg-white border p-2 rounded-lg">
+                            
+                            <button type="submit" class="w-full bg-purple-600 hover:bg-purple-700 text-white font-medium py-2 rounded-lg transition mt-4">Ruaj & Krijoni Llogarinë</button>
+                        </form>
+                    </div>
+                    <div class="lg:col-span-2">
+                        <div id="listaStafit" class="grid grid-cols-1 md:grid-cols-2 gap-4">Duke ngarkuar stafin...</div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <!-- MODALET -->
+    <div id="modalPerfundimi" class="hidden fixed inset-0 bg-gray-900 bg-opacity-50 overflow-y-auto h-full w-full z-50 flex items-center justify-center no-print">
+        <div class="bg-white p-8 rounded-xl shadow-2xl max-w-lg w-full mx-4">
+            <h3 class="text-xl font-bold text-gray-900 mb-2">Përfundo Terminin</h3>
+            <p id="emriPacientitModal" class="text-sm text-gray-500 mb-4"></p>
+            <div id="errorPerfundimi" class="hidden mb-3 text-red-600 text-sm font-semibold bg-red-50 p-2 rounded border border-red-200"></div>
+            
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Shënimet e intervenimit</label>
+                    <textarea id="shenimetMjekut" rows="3" required placeholder="Shkruani procedurën që u krye..." class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-green-500 outline-none resize-none"></textarea>
+                </div>
+                
+                <div class="bg-green-50 p-4 rounded-lg border border-green-200">
+                    <label class="block text-sm font-bold text-green-800 mb-1">Shuma e Paguar (EUR) *</label>
+                    <div class="relative">
+                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none"><span class="text-green-700 font-bold">€</span></div>
+                        <input type="number" id="cmimiIntervenimit" min="0" step="0.5" required placeholder="0" class="w-full pl-8 px-4 py-2 border border-green-300 rounded-lg focus:ring-2 focus:ring-green-500 outline-none font-bold text-lg text-gray-900">
+                    </div>
+                </div>
+            </div>
+
+            <div class="mt-6 flex justify-end space-x-3">
+                <button onclick="mbyllModalin('modalPerfundimi')" class="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg font-medium">Anulo</button>
+                <button id="btnRuajArkivo" class="px-6 py-2 bg-green-600 text-white rounded-lg font-bold shadow-sm hover:bg-green-700">Ruaj & Arkivo</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="modalEditimi" class="hidden fixed inset-0 bg-gray-900 bg-opacity-50 overflow-y-auto h-full w-full z-50 flex items-center justify-center no-print">
+        <div class="bg-white p-8 rounded-xl shadow-2xl max-w-lg w-full mx-4">
+            <h3 class="text-xl font-bold text-blue-900 mb-2">Ndrysho të dhënat e Arkivës</h3>
+            <p id="emriPacientitEdit" class="text-sm text-gray-500 mb-4"></p>
+            <div id="errorEditimi" class="hidden mb-3 text-red-600 text-sm font-semibold bg-red-50 p-2 rounded border border-red-200"></div>
+            
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Shënimet e mjekut</label>
+                    <textarea id="editShenimet" rows="3" required class="w-full px-4 py-3 border border-gray-300 rounded-lg outline-none resize-none"></textarea>
+                </div>
+                <div class="bg-blue-50 p-4 rounded-lg border border-blue-200">
+                    <label class="block text-sm font-bold text-blue-800 mb-1">Çmimi i Përditësuar (EUR)</label>
+                    <input type="number" id="editCmimi" min="0" step="0.5" required class="w-full px-4 py-2 border border-blue-300 rounded-lg outline-none font-bold text-lg">
+                </div>
+            </div>
+
+            <div class="mt-6 flex justify-end space-x-3">
+                <button onclick="mbyllModalin('modalEditimi')" class="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg font-medium">Anulo</button>
+                <button id="btnRuajNdryshimet" class="px-6 py-2 bg-blue-600 text-white rounded-lg font-bold shadow-sm hover:bg-blue-700">Përditëso</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="modalHistoria" class="hidden fixed inset-0 bg-gray-900 bg-opacity-50 overflow-y-auto h-full w-full z-50 flex items-center justify-center no-print">
+        <div class="bg-white p-8 rounded-xl shadow-2xl max-w-2xl w-full mx-4 max-h-[80vh] flex flex-col">
+            <div class="flex justify-between items-center mb-6">
+                <div>
+                    <h3 class="text-xl font-bold text-gray-900">Historia e Pacientit</h3>
+                    <p id="historiaTitulli" class="text-sm text-blue-600 mt-1"></p>
+                </div>
+                <button onclick="mbyllModalin('modalHistoria')" class="text-gray-400 hover:text-gray-600"><i class="fa-solid fa-xmark text-xl"></i></button>
+            </div>
+            <div id="historiaLista" class="overflow-y-auto pr-2 space-y-4 flex-grow"></div>
+        </div>
+    </div>
+
+    <div id="modalPassword" class="hidden fixed inset-0 bg-gray-900 bg-opacity-50 overflow-y-auto h-full w-full z-50 flex items-center justify-center no-print">
+        <div class="bg-white p-8 rounded-xl shadow-2xl max-w-sm w-full mx-4">
+            <div class="text-center mb-6">
+                <div class="inline-block p-3 rounded-full bg-yellow-100 mb-2"><i class="fa-solid fa-key text-2xl text-yellow-600"></i></div>
+                <h3 class="text-xl font-bold text-gray-900">Ndrysho Fjalëkalimin</h3>
+                <p id="emriStafitPassword" class="text-sm text-gray-500 mt-1"></p>
+            </div>
+            <div id="errorPassword" class="hidden mb-3 text-red-600 text-sm font-semibold bg-red-50 p-2 rounded"></div>
+            <div class="mb-6">
+                <label class="block text-sm font-bold text-gray-700 mb-2">Fjalëkalimi i Ri</label>
+                <input type="password" id="fjalekalimiIRi" placeholder="Shtypni fjalëkalimin e ri..." required class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-yellow-500 outline-none font-medium">
+            </div>
+            <div class="flex justify-end space-x-3">
+                <button onclick="mbyllModalin('modalPassword')" class="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg font-medium hover:bg-gray-200">Anulo</button>
+                <button id="btnRuajPassword" class="px-6 py-2 bg-yellow-500 text-white rounded-lg font-bold shadow-sm hover:bg-yellow-600">Përditëso</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="modalEditStaf" class="hidden fixed inset-0 bg-gray-900 bg-opacity-50 overflow-y-auto h-full w-full z-50 flex items-center justify-center no-print">
+        <div class="bg-white p-8 rounded-xl shadow-2xl max-w-lg w-full mx-4">
+            <h3 class="text-xl font-bold text-gray-900 mb-4">✏️ Ndrysho të Dhënat e Mjekut</h3>
+            <form id="formaEditStafit" onsubmit="ruajNdryshimetStaf(event)" class="space-y-4">
+                <input type="hidden" id="editStafId">
+                <div>
+                    <label class="block text-xs font-bold text-gray-700 mb-1">Emri Mbiemri</label>
+                    <input type="text" id="editStafEmri" required class="w-full px-3 py-2 border rounded-lg">
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-gray-700 mb-1">Roli</label>
+                    <input type="text" id="editStafRoli" required class="w-full px-3 py-2 border rounded-lg">
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-gray-700 mb-1">Përshkrimi</label>
+                    <textarea id="editStafPershkrimi" required rows="3" class="w-full px-3 py-2 border rounded-lg"></textarea>
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-gray-700 mb-1">Username</label>
+                    <input type="text" id="editStafUsername" required class="w-full px-3 py-2 border rounded-lg bg-gray-50">
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-gray-700 mt-2 mb-1">Foto e Re (Opsionale - lëreni bosh për të mbajtur të vjetrën)</label>
+                    <input type="file" id="editStafFoto" accept="image/*" class="w-full text-sm bg-white border p-2 rounded-lg">
+                </div>
+                <div class="mt-6 flex justify-end space-x-3">
+                    <button type="button" onclick="mbyllModalin('modalEditStaf')" class="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg font-medium">Anulo</button>
+                    <button type="submit" id="btnRuajEditStaf" class="px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-bold shadow-sm transition">Ruaj Ndryshimet</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div id="modalShtoPacient" class="hidden fixed inset-0 bg-gray-900 bg-opacity-50 overflow-y-auto h-full w-full z-50 flex items-center justify-center no-print">
+        <div class="bg-white p-8 rounded-xl shadow-2xl max-w-lg w-full mx-4">
+            <h3 class="text-xl font-bold text-gray-900 mb-1"><i class="fa-solid fa-user-plus text-green-600 mr-2"></i>Shto Pacient të Ri</h3>
+            <p class="text-sm text-gray-500 mb-4">Regjistro pacientin që ka ardhur direkt në klinikë.</p>
+            
+            <div id="errorShtoPacient" class="hidden mb-3 text-red-600 text-sm font-semibold bg-red-50 p-2 rounded border border-red-200"></div>
+            
+            <form id="formShtoPacient" onsubmit="ruajPacientinManual(event)" class="space-y-4">
+                <div>
+                    <label class="block text-xs font-bold text-gray-700 mb-1">Emri dhe Mbiemri *</label>
+                    <input type="text" id="shtoPacientEmri" required class="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-green-500 outline-none">
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-gray-700 mb-1">Telefoni *</label>
+                    <input type="text" id="shtoPacientTelefoni" required class="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-green-500 outline-none">
+                </div>
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-xs font-bold text-gray-700 mb-1">Data *</label>
+                        <input type="date" id="shtoPacientData" required class="w-full px-3 py-2 border rounded-lg bg-gray-50 focus:ring-2 focus:ring-green-500 outline-none">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-gray-700 mb-1">Ora *</label>
+                        <input type="time" id="shtoPacientKoha" required class="w-full px-3 py-2 border rounded-lg bg-gray-50 focus:ring-2 focus:ring-green-500 outline-none">
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-gray-700 mb-1">Mjeku (Cakto)</label>
+                    <select id="shtoPacientMjeku" class="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-green-500 outline-none bg-gray-50">
+                        <option value="Çdo Mjek">Duke ngarkuar...</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-gray-700 mb-1">Shërbimi (Lëreni bosh nëse nuk jeni të sigurt)</label>
+                    <input type="text" id="shtoPacientSherbimi" placeholder="" class="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-green-500 outline-none">
+                </div>
+                
+                <div class="mt-6 flex justify-end space-x-3 pt-2">
+                    <button type="button" onclick="mbyllModalin('modalShtoPacient')" class="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg font-medium hover:bg-gray-200">Anulo</button>
+                    <button type="submit" id="btnRuajPacient" class="px-6 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg font-bold shadow-sm transition">Regjistro Pacientin</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div id="lightboxAdmin" class="hidden fixed inset-0 bg-black bg-opacity-90 z-[100] flex flex-col items-center justify-center p-4 cursor-pointer" onclick="mbyllLightboxAdmin()">
+        <button class="absolute top-4 right-6 text-white text-5xl font-light hover:text-gray-300 transition">&times;</button>
+        <img id="lightboxImageAdmin" src="" class="max-h-[90vh] max-w-[95vw] object-contain rounded-lg shadow-2xl transition-transform duration-300 transform scale-95" alt="Foto">
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const savedRole = localStorage.getItem('mjekuRole');
+            const savedName = localStorage.getItem('mjekuName');
+            
+            const searchBox = document.getElementById('fushaKerkimit');
+            if(searchBox) { searchBox.value = ""; }
+            
+            if (savedRole && savedName) shfaqDashboard(savedRole, savedName);
+            
+            const today = new Date().toISOString().split('T')[0];
+            const shpData = document.getElementById('shpData');
+            if(shpData) shpData.value = today;
+
+            const ddm = document.getElementById('filtruShpenzimeveMuaji');
+            if(ddm) {
+                const muajiAktual = (new Date().getMonth() + 1).toString().padStart(2, '0');
+                ddm.value = muajiAktual;
+            }
+        });
+
+        async function kryejKycjen(event) {
+            event.preventDefault();
+            const usernameInput = document.getElementById('username').value;
+            const passwordInput = document.getElementById('password').value;
+            const errorDiv = document.getElementById('loginError');
+            errorDiv.classList.add('hidden');
+
+            try {
+                const response = await fetch('http://localhost:8000/api/login', {
+                    method: 'POST', headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ username: usernameInput, password: passwordInput })
+                });
+                if (response.ok) {
+                    const data = await response.json();
+                    localStorage.setItem('mjekuRole', data.role);
+                    localStorage.setItem('mjekuName', data.name);
+                    shfaqDashboard(data.role, data.name);
+                } else {
+                    const err = await response.json();
+                    errorDiv.classList.remove('hidden');
+                    errorDiv.innerHTML = `<i class="fa-solid fa-circle-exclamation mr-2"></i> ${err.detail}`;
+                }
+            } catch (error) {
+                errorDiv.classList.remove('hidden');
+                errorDiv.innerHTML = '<i class="fa-solid fa-server mr-2"></i> Gabim lidhje! Serveri nuk është ndezur.';
+            }
+        }
+
+        function shfaqDashboard(role, name) {
+            document.getElementById('loginSection').classList.add('hidden');
+            document.getElementById('dashboardSection').classList.remove('hidden');
+            document.getElementById('btnDil').classList.remove('hidden');
+            document.getElementById('mjekuTitulli').innerHTML = `<i class="fa-solid fa-user-md mr-1"></i> Loguar si: <strong>${name}</strong>`;
+            
+            const searchBox = document.getElementById('fushaKerkimit');
+            if(searchBox) { searchBox.value = ""; }
+
+            if (role === 'admin') {
+                document.getElementById('navStafi').classList.remove('hidden');
+                if(document.getElementById('btnMenuShpenzimet')) document.getElementById('btnMenuShpenzimet').classList.remove('hidden');
+            } else {
+                document.getElementById('navStafi').classList.add('hidden');
+                if(document.getElementById('btnMenuShpenzimet')) document.getElementById('btnMenuShpenzimet').classList.add('hidden');
+            }
+
+            ndrroTabin('rezervime');
+        }
+
+        function ndrroTabin(tab) {
+            const btns = ['tabRezervime', 'tabArkiva', 'btnMenuShpenzimet', 'tabGaleria', 'tabVleresime', 'tabSmile', 'tabRaportet']; 
+            const secs = ['seksioniRezervimeve', 'seksioniArkiva', 'seksioniShpenzimeve', 'seksioniGaleria', 'seksioniVleresimeve', 'seksioniSmile', 'seksioniStafit', 'seksioniRaporteve'];
+            
+            btns.forEach(id => {
+                const ele = document.getElementById(id);
+                if(ele && id !== 'btnMenuShpenzimet') ele.className = "whitespace-nowrap px-4 py-2 bg-gray-100 text-gray-700 hover:bg-gray-200 rounded-lg text-sm font-medium transition";
+                if(id === 'btnMenuShpenzimet' && ele && localStorage.getItem('mjekuRole') === 'admin') ele.className = "whitespace-nowrap px-4 py-2 bg-gray-100 text-gray-700 hover:bg-gray-200 rounded-lg text-sm font-medium transition";
+            });
+            
+            secs.forEach(id => {
+                const ele = document.getElementById(id);
+                if(ele) ele.classList.add('hidden');
+            });
+
+            const role = localStorage.getItem('mjekuRole');
+            const fushaSearch = document.getElementById('fushaKerkimit');
+            if(fushaSearch) fushaSearch.value = "";
+
+            if (tab === 'rezervime') {
+                if(document.getElementById('tabRezervime')) document.getElementById('tabRezervime').className = "whitespace-nowrap px-4 py-2 bg-gray-800 text-white rounded-lg text-sm font-medium transition";
+                document.getElementById('seksioniRezervimeve').classList.remove('hidden');
+                ngarkoRezervimet(role);
+            } else if (tab === 'arkiva') {
+                if(document.getElementById('tabArkiva')) document.getElementById('tabArkiva').className = "whitespace-nowrap px-4 py-2 bg-gray-800 text-white rounded-lg text-sm font-medium transition";
+                document.getElementById('seksioniArkiva').classList.remove('hidden');
+                ngarkoArkiven(); 
+            } else if (tab === 'shpenzimet') {
+                if(document.getElementById('btnMenuShpenzimet')) document.getElementById('btnMenuShpenzimet').className = "whitespace-nowrap px-4 py-2 bg-gray-800 text-white rounded-lg text-sm font-medium transition";
+                document.getElementById('seksioniShpenzimeve').classList.remove('hidden');
+                ngarkoShpenzimet();
+            } else if (tab === 'galeria') {
+                if(document.getElementById('tabGaleria')) document.getElementById('tabGaleria').className = "whitespace-nowrap px-4 py-2 bg-gray-800 text-white rounded-lg text-sm font-medium transition";
+                document.getElementById('seksioniGaleria').classList.remove('hidden');
+                ngarkoGaleriaAdmin(); 
+            } else if (tab === 'vleresime') {
+                if(document.getElementById('tabVleresime')) document.getElementById('tabVleresime').className = "whitespace-nowrap px-4 py-2 bg-gray-800 text-white rounded-lg text-sm font-medium transition";
+                document.getElementById('seksioniVleresimeve').classList.remove('hidden');
+                ngarkoVleresimetAdmin();
+            } else if (tab === 'smile') {
+                if(document.getElementById('tabSmile')) document.getElementById('tabSmile').className = "whitespace-nowrap px-4 py-2 bg-gray-800 text-white rounded-lg text-sm font-medium transition";
+                document.getElementById('seksioniSmile').classList.remove('hidden');
+                ngarkoSmileAdmin();
+            } else if (tab === 'raportet') {
+                if(document.getElementById('tabRaportet')) document.getElementById('tabRaportet').className = "whitespace-nowrap px-4 py-2 bg-green-600 text-white rounded-lg text-sm font-medium transition";
+                document.getElementById('seksioniRaporteve').classList.remove('hidden');
+                gjeneroRaportin();
+            } else if (tab === 'stafi') {
+                document.getElementById('seksioniStafit').classList.remove('hidden');
+                ngarkoStafin();
+            }
+            
+            const searchContainer = document.getElementById('searchContainer');
+            if (searchContainer) {
+                if (tab === 'arkiva') {
+                    searchContainer.classList.remove('hidden');
+                    searchContainer.classList.add('block');
+                } else {
+                    searchContainer.classList.remove('block');
+                    searchContainer.classList.add('hidden');
+                }
+            }
+        }
+
+        async function ngarkoRezervimet(role) {
+            const tabelaBody = document.getElementById('tabelaRezervimeve');
+            tabelaBody.innerHTML = '<tr><td colspan="6" class="px-6 py-10 text-center text-gray-500"><i class="fa-solid fa-spinner fa-spin mr-2"></i> Duke ngarkuar...</td></tr>';
+            try {
+                const response = await fetch(`http://localhost:8000/api/rezervimet/${encodeURIComponent(role)}`);
+                if(!response.ok) throw new Error("Gabim serveri");
+                const data = await response.json();
+                
+                if (data.length === 0) { tabelaBody.innerHTML = '<tr><td colspan="6" class="px-6 py-10 text-center text-gray-500">Nuk ka termine aktive për momentin.</td></tr>'; return; }
+                tabelaBody.innerHTML = '';
+                data.forEach(r => {
+                    tabelaBody.innerHTML += `
+                        <tr class="hover:bg-gray-50 border-b">
+                            <td class="px-6 py-4"><div class="text-sm font-bold text-gray-900">${r.emri}</div></td>
+                            <td class="px-6 py-4"><div class="text-sm text-gray-500">${r.telefoni}</div></td>
+                            <td class="px-6 py-4"><span class="px-2 text-xs font-semibold rounded-full bg-blue-100 text-blue-800">${r.sherbimi}</span></td>
+                            <td class="px-6 py-4 text-sm text-gray-500">${r.data} ${r.ora}</td>
+                            <td class="px-6 py-4 text-sm text-gray-500">${r.mjeku}</td>
+                            <td class="px-6 py-4 text-right">
+                                <button onclick="hapPerfundimin(${r.id}, '${r.emri.replace(/'/g, "\\'")}')" class="text-white bg-green-500 hover:bg-green-600 px-4 py-2 rounded-lg font-medium shadow"><i class="fa-solid fa-check"></i> Përfundo</button>
+                            </td>
+                        </tr>`;
+                });
+            } catch (e) {
+                tabelaBody.innerHTML = '<tr><td colspan="6" class="px-6 py-10 text-center text-red-500 font-bold"><i class="fa-solid fa-server mr-2"></i>Gabim lidhjeje me serverin!</td></tr>';
+            }
+        }
+
+        async function ngarkoArkiven() {
+            const tabelaBody = document.getElementById('tabelaArkiva');
+            tabelaBody.innerHTML = '<tr><td colspan="4" class="px-6 py-10 text-center text-gray-500"><i class="fa-solid fa-spinner fa-spin mr-2"></i> Duke ngarkuar...</td></tr>';
+            try {
+                const response = await fetch(`http://localhost:8000/api/arkiva/admin`);
+                if(!response.ok) throw new Error("Gabim serveri");
+                const data = await response.json();
+                
+                if (data.length === 0) { tabelaBody.innerHTML = '<tr><td colspan="4" class="px-6 py-10 text-center text-gray-500">Arkiva është bosh. Përfundoni një termin fillimisht.</td></tr>'; return; }
+                tabelaBody.innerHTML = '';
+                data.forEach(r => {
+                    const safeEmri = r.emri.replace(/'/g, "\\'");
+                    const safeShenime = (r.shenime || '').replace(/'/g, "\\'").replace(/\n/g, "\\n");
+
+                    tabelaBody.innerHTML += `
+                        <tr class="hover:bg-gray-50 border-b">
+                            <td class="px-6 py-4">
+                                <div class="text-sm font-bold text-gray-900">${r.emri}</div>
+                                <div class="text-xs text-gray-600 mb-1"><i class="fa-solid fa-phone mr-1"></i> ${r.telefoni}</div>
+                                <div class="text-xs text-gray-500"><i class="fa-solid fa-user-md mr-1"></i> ${r.mjeku}</div>
+                            </td>
+                            <td class="px-6 py-4 text-sm text-gray-700"><strong>${r.sherbimi}</strong><br><span class="text-xs text-gray-400">${r.data}</span></td>
+                            <td class="px-6 py-4 text-sm font-bold text-green-600">${r.cmimi ? r.cmimi + ' €' : '0 €'}</td>
+                            <td class="px-6 py-4 text-right flex justify-end space-x-2">
+                                <button onclick="hapEditimin(${r.id}, '${safeEmri}', '${safeShenime}', ${r.cmimi || 0})" class="text-yellow-600 bg-yellow-50 hover:bg-yellow-100 px-3 py-2 rounded-lg font-medium transition" title="Ndrysho të dhënat e ndërhyrjes"><i class="fa-solid fa-pen"></i></button>
+                                <button onclick="hapHistorine('${r.telefoni}', '${safeEmri}')" class="text-blue-600 bg-blue-50 hover:bg-blue-100 px-3 py-2 rounded-lg font-medium transition" title="Dosja e Pacientit"><i class="fa-solid fa-folder-open"></i></button>
+                            </td>
+                        </tr>`;
+                });
+                kerkoPacientin(); 
+            } catch (e) {
+                tabelaBody.innerHTML = '<tr><td colspan="4" class="px-6 py-10 text-center text-red-500 font-bold"><i class="fa-solid fa-server mr-2"></i>Gabim lidhjeje me databazën.</td></tr>';
+            }
+        }
+
+        async function ngarkoShpenzimet() {
+            const tabelaBody = document.getElementById('tabelaShpenzimeve');
+            const muajiZgjedhur = document.getElementById('filtruShpenzimeveMuaji') ? document.getElementById('filtruShpenzimeveMuaji').value : 'all';
+            const vitiAktual = new Date().getFullYear();
+
+            let emriMuajit = document.getElementById('filtruShpenzimeveMuaji').options[document.getElementById('filtruShpenzimeveMuaji').selectedIndex].text;
+            document.getElementById('titulliBlerjevePDF').innerText = muajiZgjedhur === 'all' ? "Pasqyra Vjetore " + vitiAktual : "Pasqyra e Blerjeve - " + emriMuajit + " " + vitiAktual;
+
+            tabelaBody.innerHTML = '<tr><td colspan="4" class="px-6 py-10 text-center text-gray-500"><i class="fa-solid fa-spinner fa-spin mr-2"></i> Duke ngarkuar shpenzimet...</td></tr>';
+            try {
+                const response = await fetch(`http://localhost:8000/api/shpenzimet`);
+                if(!response.ok) throw new Error("Gabim serveri");
+                let data = await response.json();
+                
+                if (muajiZgjedhur !== 'all') {
+                    data = data.filter(s => s.data && s.data.startsWith(`${vitiAktual}-${muajiZgjedhur}`));
+                }
+
+                let totalKostoja = 0;
+                if (data.length === 0) { 
+                    tabelaBody.innerHTML = '<tr><td colspan="4" class="px-6 py-10 text-center text-gray-500">Nuk ka asnjë blerje/shpenzim për këtë periudhë.</td></tr>'; 
+                    document.getElementById('totaliShpenzimeveStat').innerText = "0 €";
+                    return; 
+                }
+                
+                tabelaBody.innerHTML = '';
+                data.forEach(s => {
+                    let kosto = parseFloat(s.cmimi) || 0;
+                    totalKostoja += kosto;
+                    tabelaBody.innerHTML += `
+                        <tr class="hover:bg-orange-50 border-b transition">
+                            <td class="px-4 py-3">
+                                <div class="text-sm font-bold text-gray-900">${s.materiali}</div>
+                                <div class="text-xs text-gray-500 mt-1"><i class="fa-solid fa-truck-moving text-orange-400 mr-1"></i> ${s.kompania}</div>
+                            </td>
+                            <td class="px-4 py-3 text-sm text-gray-600">${s.data}</td>
+                            <td class="px-4 py-3 text-sm font-bold text-orange-600">${kosto} €</td>
+                            <td class="px-4 py-3 text-right no-print">
+                                <button onclick="fshiShpenzim(${s.id})" class="text-red-500 bg-red-50 hover:bg-red-500 hover:text-white px-3 py-1 rounded transition border border-red-100" title="Fshi faturën"><i class="fa-solid fa-trash"></i></button>
+                            </td>
+                        </tr>`;
+                });
+
+                document.getElementById('totaliShpenzimeveStat').innerText = totalKostoja.toLocaleString() + " €";
+            } catch (e) {
+                tabelaBody.innerHTML = '<tr><td colspan="4" class="px-6 py-10 text-center text-red-500 font-bold">Gabim lidhjeje me databazën.</td></tr>';
+            }
+        }
+
+        async function shtoShpenzim(event) {
+            event.preventDefault();
+            const btn = document.getElementById('btnShtoShpenzim');
+            const originalText = btn.innerHTML;
+            btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Duke ruajtur...';
+
+            const payload = {
+                materiali: document.getElementById('shpMateriali').value,
+                kompania: document.getElementById('shpKompania').value,
+                cmimi: parseFloat(document.getElementById('shpCmimi').value),
+                data: document.getElementById('shpData').value
+            };
+
+            try {
+                const res = await fetch('http://localhost:8000/api/shpenzimet', {
+                    method: 'POST', headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+                if(!res.ok) throw new Error();
+                
+                document.getElementById('formaShpenzimit').reset();
+                const today = new Date().toISOString().split('T')[0];
+                document.getElementById('shpData').value = today;
+                
+                ngarkoShpenzimet();
+            } catch(e) {
+                alert("Ndodhi një gabim gjatë ruajtjes së shpenzimit!");
+            }
+            btn.innerHTML = originalText;
+        }
+
+        async function fshiShpenzim(id) {
+            if(confirm("Jeni i sigurt që dëshironi ta fshini këtë shpenzim?")) {
+                try {
+                    await fetch(`http://localhost:8000/api/shpenzimet/${id}`, { method: 'DELETE' });
+                    ngarkoShpenzimet();
+                } catch(e) { alert("Gabim gjatë fshirjes."); }
+            }
+        }
+
+        async function printoBlerjet() {
+            const muajiZgjedhur = document.getElementById('filtruShpenzimeveMuaji').value;
+            const vitiAktual = new Date().getFullYear();
+            let emriMuajit = document.getElementById('filtruShpenzimeveMuaji').options[document.getElementById('filtruShpenzimeveMuaji').selectedIndex].text;
+            
+            document.getElementById('titulliBlerjevePrintPDF').innerText = muajiZgjedhur === 'all' ? "Pasqyra Vjetore " + vitiAktual : "Pasqyra e Blerjeve - " + emriMuajit + " " + vitiAktual;
+
+            const tabelaPrint = document.getElementById('tabelaBlerjevePrint');
+            tabelaPrint.innerHTML = '<tr><td colspan="3" class="px-4 py-4 text-center text-gray-500">Duke përgatitur...</td></tr>';
+
+            try {
+                const res = await fetch(`http://localhost:8000/api/shpenzimet`);
+                let data = await res.json();
+
+                if (muajiZgjedhur !== 'all') {
+                    data = data.filter(s => s.data && s.data.startsWith(`${vitiAktual}-${muajiZgjedhur}`));
+                }
+
+                let totalKostoja = 0;
+                if (data.length === 0) {
+                    tabelaPrint.innerHTML = '<tr><td colspan="3" class="px-4 py-4 text-center text-gray-500">Nuk ka blerje për këtë periudhë.</td></tr>';
+                } else {
+                    tabelaPrint.innerHTML = '';
+                    data.forEach(s => {
+                        let kosto = parseFloat(s.cmimi) || 0;
+                        totalKostoja += kosto;
+                        tabelaPrint.innerHTML += `
+                            <tr>
+                                <td class="px-4 py-2"><strong>${s.materiali}</strong><br><span class="text-xs text-gray-500">${s.kompania}</span></td>
+                                <td class="px-4 py-2 text-sm text-gray-600">${s.data}</td>
+                                <td class="px-4 py-2 text-right font-bold text-orange-600">${kosto} €</td>
+                            </tr>
+                        `;
+                    });
+                }
+                document.getElementById('totaliBlerjevePrintStat').innerText = totalKostoja.toLocaleString() + " €";
+
+                // Hap dritaren e printimit direkt pas mbushjes së zonës së printimit
+                window.print();
+            } catch(e) {
+                alert("Gabim gjatë përgatitjes për printim.");
+            }
+        }
+
+        window.kerkoPacientin = function() {
+            const fusha = document.getElementById("fushaKerkimit");
+            if (!fusha) return;
+            const rawTerm = fusha.value.toLowerCase().trim();
+            const termNormal = rawTerm.replace(/\s+/g, ' ');
+            const termPaHapesira = rawTerm.replace(/\s+/g, '');
+
+            const tbody = document.getElementById('tabelaArkiva');
+            if (!tbody) return;
+            const rreshtat = tbody.querySelectorAll('tr');
+            rreshtat.forEach(tr => {
+                if (tr.querySelector('td[colspan]')) return;
+                const textOrigjinal = tr.textContent.toLowerCase();
+                const tekstNormal = textOrigjinal.replace(/\s+/g, ' ');
+                const tekstPaHapesira = textOrigjinal.replace(/\s+/g, '');
+                if (tekstNormal.includes(termNormal) || tekstPaHapesira.includes(termPaHapesira)) {
+                    tr.style.display = '';
+                } else {
+                    tr.style.display = 'none';
+                }
+            });
+        };
+
+        let rezervimiAktivId = null;
+        function hapPerfundimin(id, emri) {
+            rezervimiAktivId = id;
+            document.getElementById('emriPacientitModal').innerHTML = `Pacienti: <strong class="text-gray-900">${emri}</strong>`;
+            document.getElementById('shenimetMjekut').value = '';
+            document.getElementById('cmimiIntervenimit').value = ''; 
+            document.getElementById('errorPerfundimi').classList.add('hidden');
+            document.getElementById('modalPerfundimi').classList.remove('hidden');
+            
+            const btnRuaj = document.getElementById('btnRuajArkivo');
+            btnRuaj.onclick = async function() {
+                const shenime = document.getElementById('shenimetMjekut').value;
+                const cmimiStr = document.getElementById('cmimiIntervenimit').value;
+                if(!shenime || !cmimiStr) {
+                    document.getElementById('errorPerfundimi').innerText = "Të gjitha fushat janë të detyrueshme!";
+                    document.getElementById('errorPerfundimi').classList.remove('hidden');
+                    return;
+                }
+                btnRuaj.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Po ruhet...';
+                try {
+                    const res = await fetch(`http://localhost:8000/api/rezervimet/${rezervimiAktivId}/perfunduar`, {
+                        method: 'POST', headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ shenime: shenime, cmimi: parseFloat(cmimiStr) })
+                    });
+                    if(!res.ok) throw new Error("Backend gabim");
+                    mbyllModalin('modalPerfundimi');
+                    ndrroTabin('arkiva'); 
+                } catch(e) {
+                    document.getElementById('errorPerfundimi').innerText = "Ndodhi një gabim gjatë ruajtjes. Kontrolloni serverin!";
+                    document.getElementById('errorPerfundimi').classList.remove('hidden');
+                }
+                btnRuaj.innerHTML = 'Ruaj & Arkivo';
+            };
+        }
+
+        let editAktivId = null;
+        function hapEditimin(id, emri, shenimeTashme, cmimiTashme) {
+            editAktivId = id;
+            document.getElementById('emriPacientitEdit').innerHTML = `Pacienti: <strong class="text-gray-900">${emri}</strong>`;
+            document.getElementById('editShenimet').value = shenimeTashme;
+            document.getElementById('editCmimi').value = cmimiTashme;
+            document.getElementById('errorEditimi').classList.add('hidden');
+            document.getElementById('modalEditimi').classList.remove('hidden');
+
+            const btnRuaj = document.getElementById('btnRuajNdryshimet');
+            btnRuaj.onclick = async function() {
+                const shenimeTëReja = document.getElementById('editShenimet').value;
+                const cmimiIRi = document.getElementById('editCmimi').value;
+                if(!shenimeTëReja || !cmimiIRi) {
+                    document.getElementById('errorEditimi').innerText = "Fushat nuk mund të lihen bosh!";
+                    document.getElementById('errorEditimi').classList.remove('hidden');
+                    return;
+                }
+                btnRuaj.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Duke përditësuar...';
+                try {
+                    const res = await fetch(`http://localhost:8000/api/rezervimet/${editAktivId}/ndrysho`, {
+                        method: 'POST', headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ shenime: shenimeTëReja, cmimi: parseFloat(cmimiIRi) })
+                    });
+                    if(!res.ok) throw new Error("Gabim");
+                    mbyllModalin('modalEditimi');
+                    ngarkoArkiven(); 
+                } catch(e) {
+                    document.getElementById('errorEditimi').innerText = "Lidhja dështoi. Provoni përsëri.";
+                    document.getElementById('errorEditimi').classList.remove('hidden');
+                }
+                btnRuaj.innerHTML = 'Përditëso';
+            };
+        }
+
+        async function hapHistorine(telefoni, emri) {
+            document.getElementById('historiaTitulli').innerHTML = `<i class="fa-solid fa-user"></i> ${emri} | <i class="fa-solid fa-phone"></i> ${telefoni}`;
+            document.getElementById('modalHistoria').classList.remove('hidden');
+            const lista = document.getElementById('historiaLista');
+            lista.innerHTML = 'Duke ngarkuar...';
+            try {
+                const response = await fetch(`http://localhost:8000/api/historia/${encodeURIComponent(telefoni)}`);
+                if(!response.ok) throw new Error();
+                const data = await response.json();
+                if (data.length === 0) { lista.innerHTML = '<div class="p-4 text-center">Nuk ka histori të mëparshme.</div>'; return; }
+                lista.innerHTML = '';
+                data.forEach(item => {
+                    lista.innerHTML += `
+                        <div class="bg-gray-50 rounded-xl p-5 border border-gray-200">
+                            <div class="flex justify-between items-start mb-3 border-b pb-2">
+                                <div><span class="font-bold text-gray-900">${item.data}</span><span class="ml-3 text-sm text-gray-600"><i class="fa-solid fa-user-md text-xs"></i> ${item.mjeku}</span></div>
+                                <span class="px-2 py-1 text-xs font-bold rounded bg-gray-200 text-gray-700">${item.sherbimi}</span>
+                            </div>
+                            <div class="bg-white p-4 rounded-lg border text-sm text-gray-700 leading-relaxed mb-3">
+                                <span class="fontsemibold text-gray-900 block mb-1">Shënimet:</span>
+                                ${item.shenime.replace(/\n/g, '<br>')}
+                            </div>
+                            <div class="text-right text-green-700 font-bold text-sm">Shuma: ${item.cmimi || 0} €</div>
+                        </div>`;
+                });
+            } catch (e) { lista.innerHTML = '<div class="text-red-500 p-4">Gabim në tërheqjen e historisë.</div>'; }
+        }
+
+        async function gjeneroRaportin() {
+            const muajiZgjedhur = document.getElementById('raportiMuaji').value;
+            const role = localStorage.getItem('mjekuRole');
+            const emriMjekut = localStorage.getItem('mjekuName');
+            const vitiAktual = new Date().getFullYear();
+            
+            let emriMuajit = document.getElementById('raportiMuaji').options[document.getElementById('raportiMuaji').selectedIndex].text;
+            let titulli = muajiZgjedhur === 'all' ? "Raporti Vjetor " + vitiAktual : "Raporti - " + emriMuajit + " " + vitiAktual;
+            
+            document.getElementById('raportiTitulli').innerText = titulli;
+            document.getElementById('titulliRaportitPDF').innerText = titulli + " | Gjeneruar nga: " + emriMjekut;
+
+            const tabelaTeArdhurat = document.getElementById('tabelaRaportitDetajuar');
+            const tabelaShpenzimeveRap = document.getElementById('tabelaRaportitShpenzimeve');
+            
+            tabelaTeArdhurat.innerHTML = '<tr><td colspan="5" class="px-4 py-4 text-center text-gray-500">Duke kalkuluar...</td></tr>';
+            if(tabelaShpenzimeveRap) tabelaShpenzimeveRap.innerHTML = '<tr><td colspan="4" class="px-4 py-4 text-center text-gray-500">Duke kalkuluar...</td></tr>';
+
+            try {
+                const resArkiva = await fetch(`http://localhost:8000/api/arkiva/admin`);
+                let dataArkiva = await resArkiva.json();
+                
+                let dataShpenzimet = [];
+                if(role === 'admin') {
+                    const resShpenzimet = await fetch(`http://localhost:8000/api/shpenzimet`);
+                    dataShpenzimet = await resShpenzimet.json();
+                }
+
+                if(role !== 'admin') {
+                    dataArkiva = dataArkiva.filter(r => r.mjeku === role);
+                }
+
+                if(muajiZgjedhur !== 'all') {
+                    dataArkiva = dataArkiva.filter(r => r.data && r.data.startsWith(`${vitiAktual}-${muajiZgjedhur}`));
+                    dataShpenzimet = dataShpenzimet.filter(r => r.data && r.data.startsWith(`${vitiAktual}-${muajiZgjedhur}`));
+                } else {
+                    dataArkiva = dataArkiva.filter(r => r.data && r.data.startsWith(`${vitiAktual}`));
+                    dataShpenzimet = dataShpenzimet.filter(r => r.data && r.data.startsWith(`${vitiAktual}`));
+                }
+
+                let totalTeArdhurat = 0;
+                tabelaTeArdhurat.innerHTML = '';
+                if(dataArkiva.length === 0) {
+                    tabelaTeArdhurat.innerHTML = '<tr><td colspan="5" class="px-4 py-6 text-center text-gray-500">Nuk ka të hyra për këtë periudhë.</td></tr>';
+                } else {
+                    dataArkiva.forEach(r => {
+                        let cmimi = parseFloat(r.cmimi) || 0;
+                        totalTeArdhurat += cmimi;
+                        tabelaTeArdhurat.innerHTML += `
+                            <tr class="hover:bg-gray-50">
+                                <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-900">${r.data}</td>
+                                <td class="px-4 py-3 whitespace-nowrap text-sm font-medium text-gray-900">${r.emri}</td>
+                                <td class="px-4 py-3 whitespace-nowrap text-sm text-blue-600 font-medium bg-blue-50 border-l border-r"><i class="fa-solid fa-user-md mr-1"></i> ${r.mjeku}</td>
+                                <td class="px-4 py-3 text-sm text-gray-600">
+                                    <span class="font-semibold text-gray-800">${r.sherbimi}</span><br>
+                                    <span class="text-xs text-gray-500">${r.shenime || 'Pa shënime'}</span>
+                                </td>
+                                <td class="px-4 py-3 whitespace-nowrap text-right text-sm font-bold text-green-600">+ ${cmimi} €</td>
+                            </tr>
+                        `;
+                    });
+                }
+
+                let totalShpenzimet = 0;
+                if(role === 'admin') {
+                    tabelaShpenzimeveRap.innerHTML = '';
+                    if(dataShpenzimet.length === 0) {
+                        tabelaShpenzimeveRap.innerHTML = '<tr><td colspan="4" class="px-4 py-6 text-center text-gray-500">Nuk ka blerje materiale për këtë periudhë.</td></tr>';
+                    } else {
+                        dataShpenzimet.forEach(s => {
+                            let kosto = parseFloat(s.cmimi) || 0;
+                            totalShpenzimet += kosto;
+                            tabelaShpenzimeveRap.innerHTML += `
+                                <tr class="hover:bg-orange-50">
+                                    <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-900">${s.data}</td>
+                                    <td class="px-4 py-3 text-sm font-medium text-gray-900">${s.materiali}</td>
+                                    <td class="px-4 py-3 whitespace-nowrap text-sm text-orange-600 font-medium"><i class="fa-solid fa-truck-moving mr-1"></i> ${s.kompania}</td>
+                                    <td class="px-4 py-3 whitespace-nowrap text-right text-sm font-bold text-red-600">- ${kosto} €</td>
+                                </tr>
+                            `;
+                        });
+                    }
+                }
+
+                let fitimiNeto = totalTeArdhurat - totalShpenzimet;
+
+                document.getElementById('statTëArdhurat').innerText = totalTeArdhurat.toLocaleString() + " €";
+                document.getElementById('statShpenzimet').innerText = totalShpenzimet.toLocaleString() + " €";
+                document.getElementById('statFitimi').innerText = fitimiNeto.toLocaleString() + " €";
+                
+                if(role === 'admin') {
+                    document.getElementById('raportiShpenzimetContainer').classList.remove('hidden');
+                    document.getElementById('statShpenzimetContainer').classList.remove('hidden');
+                    document.getElementById('statFitimiContainer').classList.remove('hidden');
+                } else {
+                    document.getElementById('raportiShpenzimetContainer').classList.add('hidden');
+                    document.getElementById('statShpenzimetContainer').classList.add('hidden');
+                    document.getElementById('statFitimiContainer').classList.add('hidden');
+                }
+
+            } catch (e) {
+                tabelaTeArdhurat.innerHTML = '<tr><td colspan="5" class="px-4 py-6 text-center text-red-500 font-bold">Gabim lidhjeje me serverin.</td></tr>';
+            }
+        }
+
+        async function ngarkoSmileAdmin() {
+            const lista = document.getElementById('listaSmileAdmin');
+            lista.innerHTML = '<div class="col-span-full py-10 text-center text-gray-500"><i class="fa-solid fa-spinner fa-spin text-xl mb-2"></i><br>Duke ngarkuar kërkesat...</div>';
+            try {
+                const res = await fetch('http://localhost:8000/api/smile');
+                const data = await res.json();
+                if(data.length === 0) {
+                    lista.innerHTML = '<div class="col-span-full py-10 text-center text-gray-500 border-2 border-dashed border-gray-300 rounded-xl">Nuk ka asnjë kërkesë Smile Assessment.</div>';
+                    return;
+                }
+                lista.innerHTML = '';
+                data.forEach(s => {
+                    let statusColor = s.status === 'E Re' ? 'bg-red-100 text-red-800 border-red-200' : 'bg-green-100 text-green-800 border-green-200';
+                    let fotoHtml = s.foto_url 
+                        ? `<div class="relative overflow-hidden rounded-lg mb-3 group cursor-pointer" onclick="hapLightboxAdmin('http://localhost:8000/${s.foto_url}')">
+                             <img src="http://localhost:8000/${s.foto_url}" class="w-full h-48 object-cover transform transition-transform duration-500 group-hover:scale-110">
+                             <div class="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-20 transition duration-300 flex items-center justify-center"><i class="fa-solid fa-magnifying-glass-plus text-white opacity-0 group-hover:opacity-100 text-3xl"></i></div>
+                           </div>` 
+                        : '<div class="w-full h-32 bg-gray-50 rounded-lg mb-3 flex flex-col items-center justify-center text-gray-400 border border-dashed"><i class="fa-solid fa-image-slash text-2xl mb-1"></i><span class="text-xs">Pa foto</span></div>';
+
+                    let shqyrtuarNgaHtml = (s.status === 'E Shqyrtuar' && s.shqyrtuar_nga) 
+                        ? `<div class="text-[11px] text-gray-500 font-medium mt-1 mb-2 bg-gray-50 p-1.5 rounded border border-gray-100"><i class="fa-solid fa-user-check text-green-500 mr-1"></i> Shqyrtuar nga: <strong class="text-gray-700">${s.shqyrtuar_nga}</strong></div>` 
+                        : '';
+
+                    lista.innerHTML += `
+                        <div class="bg-white border rounded-xl p-5 shadow-sm hover:shadow-md transition flex flex-col">
+                            <div class="flex justify-between items-start mb-3">
+                                <div>
+                                    <h4 class="font-bold text-gray-900 text-lg leading-tight">${s.emri}</h4>
+                                    <div class="text-sm text-blue-600 font-medium"><i class="fa-solid fa-address-book mr-1"></i> ${s.kontakti}</div>
+                                </div>
+                                <span class="px-2 py-1 text-[10px] font-bold uppercase rounded border ${statusColor}">${s.status}</span>
+                            </div>
+                            ${fotoHtml}
+                            <div class="bg-purple-50 p-3 rounded-lg border border-purple-100 mb-4 flex-grow">
+                                <p class="text-xs font-bold text-purple-800 uppercase mb-1">Dëshiron të përmirësojë:</p>
+                                <p class="text-sm text-gray-700">${s.problemi || 'Nuk ka specifikuar'}</p>
+                            </div>
+                            <div class="text-xs text-gray-400 mb-2"><i class="fa-regular fa-calendar mr-1"></i> ${s.data.split('.')[0]}</div>
+                            
+                            ${shqyrtuarNgaHtml}
+                            
+                            <div class="flex flex-wrap gap-2 pt-3 border-t border-gray-100 mt-auto">
+                                ${s.status === 'E Re' 
+                                    ? `<button onclick="ndryshoStatusSmile(${s.id}, 'E Shqyrtuar')" class="flex-grow text-xs bg-green-50 text-green-700 hover:bg-green-100 px-3 py-2 rounded font-bold border border-green-200 transition"><i class="fa-solid fa-check mr-1"></i> Shëno të Shqyrtuar</button>` 
+                                    : `<button onclick="ndryshoStatusSmile(${s.id}, 'E Re')" class="flex-grow text-xs bg-yellow-50 text-yellow-700 hover:bg-yellow-100 px-3 py-2 rounded font-bold border border-yellow-200 transition"><i class="fa-solid fa-rotate-left mr-1"></i> Kthe te të Rejat</button>`}
+                                <button onclick="fshiSmileAdmin(${s.id})" class="text-xs bg-red-50 text-red-600 hover:bg-red-100 hover:text-red-700 px-3 py-2 rounded font-bold border border-red-100 transition"><i class="fa-solid fa-trash"></i></button>
+                            </div>
+                        </div>
+                    `;
+                });
+            } catch(e) { lista.innerHTML = '<div class="col-span-full py-10 text-center text-red-500">Gabim në ngarkimin e kërkesave.</div>'; }
+        }
+
+        async function ndryshoStatusSmile(id, statusi) {
+            const mjekuEmri = statusi === 'E Shqyrtuar' ? localStorage.getItem('mjekuName') : null;
+            
+            try {
+                const res = await fetch(`http://localhost:8000/api/smile/${id}/status`, {
+                    method: 'PUT', headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ status: statusi, mjeku: mjekuEmri })
+                });
+                if (res.ok) ngarkoSmileAdmin();
+            } catch(e) { alert("Ndodhi një gabim gjatë përditësimit!"); }
+        }
+
+        async function fshiSmileAdmin(id) {
+            if(confirm("A jeni të sigurt që dëshironi ta fshini këtë kërkesë? Fotografia e bashkangjitur gjithashtu do të fshihet.")) {
+                try {
+                    const res = await fetch(`http://localhost:8000/api/smile/${id}`, { method: 'DELETE' });
+                    if (res.ok) ngarkoSmileAdmin();
+                } catch(e) { alert("Gabim gjatë fshirjes."); }
+            }
+        }
+
+        function hapLightboxAdmin(url) {
+            const lightbox = document.getElementById('lightboxAdmin');
+            const img = document.getElementById('lightboxImageAdmin');
+            img.src = url;
+            lightbox.classList.remove('hidden');
+            setTimeout(() => img.classList.replace('scale-95', 'scale-100'), 10);
+        }
+
+        function mbyllLightboxAdmin() {
+            const lightbox = document.getElementById('lightboxAdmin');
+            const img = document.getElementById('lightboxImageAdmin');
+            img.classList.replace('scale-100', 'scale-95');
+            setTimeout(() => lightbox.classList.add('hidden'), 200);
+        }
+
+        async function ngarkoStafin() {
+            const lista = document.getElementById('listaStafit');
+            try {
+                const res = await fetch('http://localhost:8000/api/stafi');
+                const data = await res.json();
+                if(data.length === 0) { lista.innerHTML = '<div class="col-span-full text-center text-gray-500">Nuk ka asnjë staf të regjistruar.</div>'; return; }
+                
+                lista.innerHTML = '';
+                data.forEach(s => {
+                    const safeEmri = s.emri.replace(/'/g, "\\'");
+                    const safeRoli = s.roli.replace(/'/g, "\\'");
+                    const safePershkrimi = s.pershkrimi.replace(/'/g, "\\'").replace(/\n/g, "\\n");
+                    const safeUser = (s.username || '').replace(/'/g, "\\'");
+
+                    lista.innerHTML += `
+                        <div class="bg-white border rounded-xl p-4 flex items-center shadow-sm">
+                            <div class="w-16 h-16 rounded-full bg-gray-200 mr-4 overflow-hidden flex-shrink-0">
+                                ${s.foto_url ? `<img src="http://localhost:8000/${s.foto_url}" class="w-full h-full object-cover">` : '<i class="fa-solid fa-user text-2xl mt-4 ml-4 text-gray-400"></i>'}
+                            </div>
+                            <div class="flex-grow">
+                                <h4 class="font-bold text-gray-900">${s.emri}</h4>
+                                <p class="text-xs text-purple-600 font-semibold uppercase mb-1">${s.roli}</p>
+                                <p class="text-xs text-gray-500 bg-gray-100 inline-block px-2 py-1 rounded border"><i class="fa-solid fa-user-lock mr-1"></i> ${s.username || 'N/A'}</p>
+                            </div>
+                            <div class="flex flex-col space-y-2 ml-2">
+                                <button onclick="hapModalEditStaf(${s.id}, '${safeEmri}', '${safeRoli}', '${safePershkrimi}', '${safeUser}')" class="text-blue-500 hover:text-blue-600 p-2 bg-blue-50 rounded-lg" title="Ndrysho të dhënat e Stafit"><i class="fa-solid fa-pen"></i></button>
+                                <button onclick="hapModalPassword(${s.id}, '${safeEmri}')" class="text-yellow-500 hover:text-yellow-600 p-2 bg-yellow-50 rounded-lg" title="Ndrysho Fjalëkalimin"><i class="fa-solid fa-key"></i></button>
+                                <button onclick="fshiStaf(${s.id})" class="text-red-500 hover:text-red-600 p-2 bg-red-50 rounded-lg" title="Fshi Anëtarin"><i class="fa-solid fa-trash"></i></button>
+                            </div>
+                        </div>
+                    `;
+                });
+            } catch(e) { lista.innerHTML = '<div class="text-red-500">Gabim në ngarkim.</div>'; }
+        }
+
+        async function shtoStaf(event) {
+            event.preventDefault();
+            const btn = event.target.querySelector('button[type="submit"]');
+            const originalText = btn.innerHTML;
+            btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Duke ruajtur...';
+
+            const formData = new FormData();
+            formData.append('emri', document.getElementById('stafEmri').value);
+            formData.append('roli', document.getElementById('stafRoli').value);
+            formData.append('pershkrimi', document.getElementById('stafPershkrimi').value);
+            formData.append('username', document.getElementById('stafUsername').value);
+            formData.append('password', document.getElementById('stafPassword').value);
+            
+            const fileInput = document.getElementById('stafFoto');
+            if (fileInput.files.length > 0) {
+                formData.append('file', fileInput.files[0]);
+            }
+
+            try {
+                const res = await fetch('http://localhost:8000/api/stafi', { method: 'POST', body: formData });
+                if (!res.ok) {
+                    const errorData = await res.json();
+                    throw new Error(errorData.detail || "Gabim gjatë ruajtjes.");
+                }
+                document.getElementById('formaStafit').reset();
+                ngarkoStafin();
+            } catch(e) { alert(e.message); }
+            btn.innerHTML = originalText;
+        }
+
+        function hapModalEditStaf(id, emri, roli, pershkrimi, username) {
+            document.getElementById('editStafId').value = id;
+            document.getElementById('editStafEmri').value = emri;
+            document.getElementById('editStafRoli').value = roli;
+            document.getElementById('editStafPershkrimi').value = pershkrimi;
+            document.getElementById('editStafUsername').value = username;
+            document.getElementById('editStafFoto').value = ''; 
+            document.getElementById('modalEditStaf').classList.remove('hidden');
+        }
+
+        async function ruajNdryshimetStaf(event) {
+            event.preventDefault();
+            const btn = document.getElementById('btnRuajEditStaf');
+            const originalText = btn.innerHTML;
+            btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Duke ruajtur...';
+
+            const id = document.getElementById('editStafId').value;
+            const formData = new FormData();
+            formData.append('emri', document.getElementById('editStafEmri').value);
+            formData.append('roli', document.getElementById('editStafRoli').value);
+            formData.append('pershkrimi', document.getElementById('editStafPershkrimi').value);
+            formData.append('username', document.getElementById('editStafUsername').value);
+            
+            const fileInput = document.getElementById('editStafFoto');
+            if (fileInput.files.length > 0) {
+                formData.append('file', fileInput.files[0]);
+            }
+
+            try {
+                const res = await fetch(`http://localhost:8000/api/stafi/${id}`, { method: 'PUT', body: formData });
+                if (!res.ok) {
+                    const errorData = await res.json();
+                    throw new Error(errorData.detail || "Gabim gjatë përditësimit.");
+                }
+                mbyllModalin('modalEditStaf');
+                ngarkoStafin(); 
+            } catch(e) { alert(e.message); }
+            btn.innerHTML = originalText;
+        }
+
+        async function ngarkoGaleriaAdmin() {
+            const lista = document.getElementById('listaGaleriaAdmin');
+            try {
+                const res = await fetch('http://localhost:8000/api/galeria');
+                const data = await res.json();
+                if(data.length === 0) { lista.innerHTML = '<div class="col-span-full text-center text-gray-500 border-2 border-dashed border-gray-300 rounded-xl py-10">Nuk ka asnjë postim në galeri. Shto të parin!</div>'; return; }
+                
+                lista.innerHTML = '';
+                data.forEach(item => {
+                    const fotoPara = item.foto_para_url.startsWith('http') ? item.foto_para_url : `http://localhost:8000/${item.foto_para_url}`;
+                    const fotoPas = item.foto_pas_url.startsWith('http') ? item.foto_pas_url : `http://localhost:8000/${item.foto_pas_url}`;
+
+                    lista.innerHTML += `
+                        <div class="bg-white border rounded-xl overflow-hidden shadow-sm flex flex-col">
+                            <div class="grid grid-cols-2 gap-0 border-b">
+                                <div class="relative">
+                                    <img src="${fotoPara}" class="w-full h-32 object-cover">
+                                    <span class="absolute top-1 left-1 bg-black bg-opacity-70 text-white text-[10px] px-1.5 py-0.5 rounded">Para</span>
+                                </div>
+                                <div class="relative">
+                                    <img src="${fotoPas}" class="w-full h-32 object-cover">
+                                    <span class="absolute top-1 right-1 bg-green-500 text-white text-[10px] px-1.5 py-0.5 rounded shadow">Pas</span>
+                                </div>
+                            </div>
+                            <div class="p-4 flex-grow flex flex-col justify-between">
+                                <div>
+                                    <h4 class="font-bold text-gray-900 text-sm mb-1">${item.titulli}</h4>
+                                    <p class="text-xs text-gray-500 line-clamp-2 mb-3">${item.pershkrimi}</p>
+                                </div>
+                                <div class="text-right">
+                                    <button onclick="fshiGaleriAdmin(${item.id})" class="text-red-500 hover:text-white hover:bg-red-500 border border-red-500 px-3 py-1 rounded text-xs font-medium transition"><i class="fa-solid fa-trash mr-1"></i> Fshi</button>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                });
+            } catch(e) { lista.innerHTML = '<div class="text-red-500">Gabim në ngarkim të galerisë.</div>'; }
+        }
+
+        async function shtoGaleri(event) {
+            event.preventDefault();
+            const btn = event.target.querySelector('button[type="submit"]');
+            const originalText = btn.innerHTML;
+            btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Duke u ngarkuar...';
+
+            const formData = new FormData();
+            formData.append('titulli', document.getElementById('galeriTitulli').value);
+            formData.append('pershkrimi', document.getElementById('galeriPershkrimi').value);
+            
+            const fotoPara = document.getElementById('galeriFotoPara');
+            const fotoPas = document.getElementById('galeriFotoPas');
+            
+            if (fotoPara.files.length === 0 || fotoPas.files.length === 0) {
+                alert("Ju lutem ngarkoni të dyja fotot!");
+                btn.innerHTML = originalText;
+                return;
+            }
+            
+            formData.append('foto_para', fotoPara.files[0]);
+            formData.append('foto_pas', fotoPas.files[0]);
+
+            try {
+                const res = await fetch('http://localhost:8000/api/galeria', { method: 'POST', body: formData });
+                if (!res.ok) throw new Error("Gabim gjatë ruajtjes.");
+                
+                document.getElementById('formaGaleria').reset();
+                ngarkoGaleriaAdmin();
+            } catch(e) { alert(e.message); }
+            btn.innerHTML = originalText;
+        }
+
+        async function fshiGaleriAdmin(id) {
+            if(confirm("A jeni i sigurt që dëshironi ta fshini këtë rast nga galeria?")) {
+                await fetch(`http://localhost:8000/api/galeria/${id}`, { method: 'DELETE' });
+                ngarkoGaleriaAdmin();
+            }
+        }
+
+        async function ngarkoVleresimetAdmin() {
+            const lista = document.getElementById('listaVleresimeveAdmin');
+            try {
+                const res = await fetch('http://localhost:8000/api/vleresimet/admin');
+                const data = await res.json();
+                if(data.length === 0) { lista.innerHTML = '<div class="col-span-full py-10 text-center text-gray-500">Ende nuk ka asnjë vlerësim nga pacientët.</div>'; return; }
+                
+                lista.innerHTML = '';
+                data.forEach(v => {
+                    let yjetHtml = '';
+                    for(let i=0; i<5; i++) {
+                        yjetHtml += i < v.yje ? '<i class="fa-solid fa-star text-yellow-400"></i>' : '<i class="fa-regular fa-star text-gray-300"></i>';
+                    }
+                    
+                    let statusColor = 'bg-yellow-100 text-yellow-800 border-yellow-200';
+                    if (v.status === 'E Aprovuar') statusColor = 'bg-green-100 text-green-800 border-green-200';
+                    if (v.status === 'E Fshehur') statusColor = 'bg-gray-200 text-gray-600 border-gray-300';
+
+                    lista.innerHTML += `
+                        <div class="bg-white border rounded-xl p-5 shadow-sm hover:shadow transition flex flex-col">
+                            <div class="flex justify-between items-start mb-3">
+                                <div>
+                                    <h4 class="font-bold text-gray-900">${v.emri}</h4>
+                                    <div class="text-sm mt-1">${yjetHtml}</div>
+                                </div>
+                                <span class="px-2 py-1 text-[10px] font-bold uppercase rounded border ${statusColor}">${v.status}</span>
+                            </div>
+                            <p class="text-sm text-gray-600 flex-grow italic mb-4">"${v.komenti}"</p>
+                            <div class="text-xs text-gray-400 mb-3"><i class="fa-regular fa-calendar mr-1"></i> ${v.data.split(' ')[0]}</div>
+                            
+                            <div class="flex flex-wrap gap-2 pt-3 border-t border-gray-100">
+                                ${v.status !== 'E Aprovuar' ? `<button onclick="ndryshoStatusVleresimi(${v.id}, 'E Aprovuar')" class="text-xs bg-green-50 text-green-600 hover:bg-green-100 px-3 py-1.5 rounded font-medium border border-green-100 transition"><i class="fa-solid fa-check mr-1"></i> Aprovo</button>` : ''}
+                                ${v.status !== 'E Fshehur' ? `<button onclick="ndryshoStatusVleresimi(${v.id}, 'E Fshehur')" class="text-xs bg-gray-50 text-gray-600 hover:bg-gray-200 px-3 py-1.5 rounded font-medium border border-gray-200 transition"><i class="fa-solid fa-eye-slash mr-1"></i> Fshih</button>` : ''}
+                                <button onclick="fshiVleresimAdmin(${v.id})" class="text-xs bg-red-50 text-red-600 hover:bg-red-100 px-3 py-1.5 rounded font-medium border border-red-100 transition ml-auto"><i class="fa-solid fa-trash"></i></button>
+                            </div>
+                        </div>
+                    `;
+                });
+            } catch(e) { lista.innerHTML = '<div class="col-span-full py-10 text-center text-red-500">Gabim në ngarkimin e vlerësimeve.</div>'; }
+        }
+
+        async function ndryshoStatusVleresimi(id, statusi_iri) {
+            try {
+                const res = await fetch(`http://localhost:8000/api/vleresimet/${id}/status`, {
+                    method: 'PUT', headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ status: statusi_iri })
+                });
+                if (res.ok) ngarkoVleresimetAdmin();
+            } catch(e) { alert("Ndodhi një gabim gjatë përditësimit!"); }
+        }
+
+        async function fshiVleresimAdmin(id) {
+            if(confirm("A jeni i sigurt që dëshironi ta fshini përgjithmonë këtë vlerësim?")) {
+                try {
+                    const res = await fetch(`http://localhost:8000/api/vleresimet/${id}`, { method: 'DELETE' });
+                    if (res.ok) ngarkoVleresimetAdmin();
+                } catch(e) { alert("Gabim gjatë fshirjes."); }
+            }
+        }
+
+        function hapModalinShtoPacient() {
+            document.getElementById('modalShtoPacient').classList.remove('hidden');
+            document.getElementById('errorShtoPacient').classList.add('hidden');
+            document.getElementById('formShtoPacient').reset();
+            
+            const sot = new Date().toISOString().split('T')[0];
+            document.getElementById('shtoPacientData').value = sot;
+            
+            const tani = new Date();
+            const koha = tani.getHours().toString().padStart(2, '0') + ":" + tani.getMinutes().toString().padStart(2, '0');
+            document.getElementById('shtoPacientKoha').value = koha;
+
+            ngarkoMjeketPerModal();
+        }
+
+        async function ngarkoMjeketPerModal() {
+            const dropdown = document.getElementById('shtoPacientMjeku');
+            try {
+                const res = await fetch('http://localhost:8000/api/stafi');
+                const stafi = await res.json();
+                dropdown.innerHTML = '<option value="Çdo Mjek">Cili të jetë i lirë</option>';
+                const emriMjekutKycur = localStorage.getItem('mjekuName');
+                
+                stafi.forEach(m => {
+                    const iZgjedhur = (emriMjekutKycur === m.emri) ? 'selected' : '';
+                    dropdown.innerHTML += `<option value="${m.emri}" ${iZgjedhur}>${m.emri} - ${m.roli}</option>`;
+                });
+            } catch(e) { dropdown.innerHTML = '<option value="Çdo Mjek">Klinika</option>'; }
+        }
+
+        async function ruajPacientinManual(event) {
+            event.preventDefault();
+            const btn = document.getElementById('btnRuajPacient');
+            const tekstiOrigjinal = btn.innerHTML;
+            btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin mr-1"></i> Po ruhet...';
+            
+            const payload = {
+                emri: document.getElementById('shtoPacientEmri').value,
+                telefoni: document.getElementById('shtoPacientTelefoni').value,
+                mjeku: document.getElementById('shtoPacientMjeku').value,
+                sherbimi: document.getElementById('shtoPacientSherbimi').value,
+                data_preferuar: document.getElementById('shtoPacientData').value,
+                koha_preferuar: document.getElementById('shtoPacientKoha').value
+            };
+
+            try {
+                const res = await fetch('http://localhost:8000/api/booking', {
+                    method: 'POST', headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+                if(!res.ok) throw new Error();
+                mbyllModalin('modalShtoPacient');
+                const role = localStorage.getItem('mjekuRole');
+                ngarkoRezervimet(role);
+            } catch(e) {
+                document.getElementById('errorShtoPacient').innerText = "Lidhja me databazën dështoi!";
+                document.getElementById('errorShtoPacient').classList.remove('hidden');
+            }
+            btn.innerHTML = tekstiOrigjinal;
+        }
+
+        let passwordAktivId = null;
+        function hapModalPassword(id, emri) {
+            passwordAktivId = id;
+            document.getElementById('emriStafitPassword').innerText = "Llogaria: " + emri;
+            document.getElementById('fjalekalimiIRi').value = '';
+            document.getElementById('errorPassword').classList.add('hidden');
+            document.getElementById('modalPassword').classList.remove('hidden');
+            
+            const btnRuaj = document.getElementById('btnRuajPassword');
+            btnRuaj.onclick = async function() {
+                const newPassword = document.getElementById('fjalekalimiIRi').value;
+                if(!newPassword) {
+                    document.getElementById('errorPassword').innerText = "Fjalëkalimi nuk mund të jetë bosh!";
+                    document.getElementById('errorPassword').classList.remove('hidden');
+                    return;
+                }
+                btnRuaj.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Po ruhet...';
+                try {
+                    const res = await fetch(`http://localhost:8000/api/stafi/${passwordAktivId}/password`, {
+                        method: 'PUT', headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ password: newPassword })
+                    });
+                    if(!res.ok) throw new Error("Gabim serveri");
+                    mbyllModalin('modalPassword');
+                } catch(e) {
+                    document.getElementById('errorPassword').innerText = "Ndodhi një gabim gjatë ndryshimit.";
+                    document.getElementById('errorPassword').classList.remove('hidden');
+                }
+                btnRuaj.innerHTML = 'Përditëso';
+            };
+        }
+
+        async function fshiStaf(id) {
+            if(confirm("A jeni i sigurt që dëshironi ta fshini këtë anëtar të stafit?")) {
+                await fetch(`http://localhost:8000/api/stafi/${id}`, { method: 'DELETE' });
+                ngarkoStafin();
+            }
+        }
+
+        function mbyllModalin(id) { document.getElementById(id).classList.add('hidden'); }
+        function dil() { localStorage.removeItem('mjekuRole'); window.location.reload(); }
+        function eksportoPDF() { window.print(); }
+    </script>
+</body>
+</html>

@@ -1,0 +1,890 @@
+<!DOCTYPE html>
+<html lang="sq">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Zen Dental | Your Smile, Our Passion</title>
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 448 512'><path fill='%2310b981' d='M418.8 496.2c-15.1 9.4-34.6 4.6-43.2-10.7L288 340l-87.6 145.5c-8.6 15.3-28.1 20-43.2 10.7S134.4 466 143 450.7L209 341.2c-6.8-9.4-12.3-19.8-16.2-31l-38.6-113c-2.4-7-6.2-13.6-11.2-19.3-12.8-14.7-31.5-22.6-51-21.6-32.2 1.6-59 27.6-59 60.1V288c0 17.7-14.3 32-32 32s-32-14.3-32-32v-71.6C1 149.7 54.1 95 120.5 91.1c39.6-2.4 76.5 17 97.4 51.5C238.8 108.1 275.7 88.7 315.3 91.1c66.4 3.9 119.5 58.6 119.5 125.3V288c0 17.7-14.3 32-32 32s-32-14.3-32-32V216.4c0-32.5-26.8-58.5-59-60.1-19.5-1-38.2 6.9-51 21.6-5 5.7-8.8 12.3-11.2 19.3l-38.6 113c-3.9 11.2-9.4 21.6-16.2 31L360 450.7c8.6 15.3 3.8 34.8-11.2 45.5z'/></svg>">
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #FAF7F2; 
+            color: #2C3E35;
+        }
+        .bg-zen-dark { background-color: #2C3E35; }
+        .text-zen-dark { color: #2C3E35; }
+        .bg-zen-green { background-color: #3B5249; }
+        .hover-bg-zen-green:hover { background-color: #2C3E35; }
+        .btn-primary {
+            background-color: #3B5249;
+            color: white;
+            border-radius: 9999px;
+            padding: 0.75rem 1.5rem;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+        .btn-primary:hover {
+            background-color: #2C3E35;
+            transform: translateY(-2px);
+        }
+        
+        .star-rating input { display: none; }
+        .star-rating label { font-size: 30px; color: #d1d5db; cursor: pointer; transition: color 0.2s; }
+        .star-rating input:checked ~ label,
+        .star-rating label:hover,
+        .star-rating label:hover ~ label { color: #fbbf24; }
+        .star-rating { display: flex; flex-direction: row-reverse; justify-content: flex-end; }
+    </style>
+</head>
+<body class="antialiased flex flex-col min-h-screen">
+
+    <nav class="bg-white shadow-sm sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-20">
+                <!-- Logoja -->
+                <div class="flex items-center cursor-pointer" onclick="ndrroFaqen('faqjaKryesore')">
+                    <img src="uploads/ZenDentalLogo.jpg" alt="Zen Dental Logo" class="h-12 w-auto">
+                </div>
+                
+                <!-- Menyja për Desktop -->
+                <div class="hidden md:flex items-center space-x-6 lg:space-x-8">
+                    <button id="nav-faqjaKryesore" onclick="ndrroFaqen('faqjaKryesore')" class="text-green-700 font-bold transition border-b-2 border-green-700 pb-1">Kryefaqja</button>
+                    <button id="nav-kontakt" onclick="ndrroFaqen('kontakt')" class="text-gray-600 hover:text-green-700 font-medium transition border-b-2 border-transparent pb-1">Kontakti & Ekipi</button>
+                    <button id="nav-galeria" onclick="ndrroFaqen('galeria')" class="text-gray-600 hover:text-green-700 font-medium transition border-b-2 border-transparent pb-1">Galeria</button>
+                    <button id="nav-smileAssessment" onclick="ndrroFaqen('smileAssessment')" class="text-gray-600 hover:text-green-700 font-medium transition border-b-2 border-transparent pb-1 flex items-center"><i class="fa-solid fa-wand-magic-sparkles mr-1 text-yellow-500"></i> Smile Assessment</button>
+                    <button onclick="ndrroFaqen('rezervoTermin')" class="btn-primary font-medium">Rezervo Termin</button>
+                </div>
+                
+                <!-- Butoni Hamburger për Mobile -->
+                <div class="flex items-center md:hidden">
+                    <button id="mobileMenuBtn" onclick="toggleMobileMenu()" class="text-gray-600 hover:text-zen-dark focus:outline-none p-2 rounded-md hover:bg-gray-100 transition">
+                        <i id="menuIcon" class="fa-solid fa-bars text-2xl"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Menyja Mobile -->
+        <div id="mobileMenu" class="hidden md:hidden bg-white border-t border-gray-100 shadow-md absolute w-full left-0 z-40 origin-top transform transition-all duration-300 ease-in-out opacity-0 scale-y-0">
+            <div class="px-4 pt-2 pb-6 space-y-2 flex flex-col">
+                <button onclick="ndrroFaqenMobile('faqjaKryesore')" class="w-full text-left px-4 py-3 rounded-lg text-zen-dark hover:bg-green-50 hover:text-green-700 font-semibold transition">Kryefaqja</button>
+                <button onclick="ndrroFaqenMobile('kontakt')" class="w-full text-left px-4 py-3 rounded-lg text-gray-600 hover:bg-green-50 hover:text-green-700 font-medium transition">Kontakt & Ekipi</button>
+                <button onclick="ndrroFaqenMobile('galeria')" class="w-full text-left px-4 py-3 rounded-lg text-gray-600 hover:bg-green-50 hover:text-green-700 font-medium transition">Galeria</button>
+                <button onclick="ndrroFaqenMobile('smileAssessment')" class="w-full text-left px-4 py-3 rounded-lg text-gray-600 hover:bg-green-50 hover:text-green-700 font-medium transition flex items-center"><i class="fa-solid fa-wand-magic-sparkles mr-2 text-yellow-500"></i> Smile Assessment</button>
+                <div class="pt-4 mt-2 border-t border-gray-100">
+                    <button onclick="ndrroFaqenMobile('rezervoTermin')" class="w-full btn-primary text-center font-bold text-lg py-3 shadow">Rezervo Termin Tani</button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <main class="flex-grow relative">
+        <div id="faqjaKryesore" class="page-section">
+            
+            <div class="relative bg-white overflow-hidden">
+                <div class="max-w-7xl mx-auto">
+                    <div class="relative z-10 pb-8 bg-white sm:pb-16 md:pb-20 lg:max-w-2xl lg:w-full lg:pb-28 xl:pb-32 pt-16 px-4 sm:px-6 lg:px-8">
+                        <h1 class="text-4xl tracking-tight font-extrabold text-zen-dark sm:text-5xl md:text-6xl">
+                            <span class="block">Your Smile,</span>
+                            <span class="block text-green-700">Our Passion.</span>
+                        </h1>
+                        <p class="mt-3 text-base text-gray-500 sm:mt-5 sm:text-lg sm:max-w-xl sm:mx-auto md:mt-5 md:text-xl lg:mx-0">
+                            Mirësevini në Zen Dental. Ne kombinojmë teknologjinë më moderne digjitale me një ambient qetësues për t'ju ofruar një përvojë plotësisht të re.
+                        </p>
+                        <div class="mt-5 sm:mt-8 sm:flex sm:justify-center lg:justify-start">
+                            <div class="rounded-md shadow">
+                                <button onclick="ndrroFaqen('rezervoTermin')" class="w-full flex items-center justify-center px-8 py-3 border border-transparent text-base font-medium rounded-full text-white bg-green-700 hover:bg-green-800 md:py-4 md:text-lg transition">
+                                    Rezervo Online
+                                </button>
+                            </div>
+                            <div class="mt-3 sm:mt-0 sm:ml-3">
+                                <button onclick="ndrroFaqen('smileAssessment')" class="w-full flex items-center justify-center px-8 py-3 border border-transparent text-base font-medium rounded-full text-green-700 bg-green-100 hover:bg-green-200 md:py-4 md:text-lg transition">
+                                    Vlerësimi i Buzëqeshjes
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="lg:absolute lg:inset-y-0 lg:right-0 lg:w-1/2">
+                    <img class="h-56 w-full object-cover sm:h-72 md:h-96 lg:w-full lg:h-full" src="https://images.unsplash.com/photo-1606811841689-23dfddce3e95?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80" alt="Klinika Dentale">
+                </div>
+            </div>
+
+            <div class="py-16 bg-[#FAF7F2]">
+                <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                    <div class="text-center mb-12">
+                        <h2 class="text-3xl font-extrabold text-zen-dark">Shërbimet Tona</h2>
+                        <p class="mt-4 text-lg text-gray-600">Ekselencë në çdo detaj, për një buzëqeshje perfekte.</p>
+                    </div>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                        <div class="bg-white rounded-2xl p-6 shadow-sm hover:shadow-md transition text-center border border-gray-100 flex flex-col items-center">
+                            <div class="w-14 h-14 mx-auto bg-blue-50 rounded-full flex items-center justify-center mb-4"><i class="fa-solid fa-stethoscope text-xl text-blue-600"></i></div>
+                            <h3 class="text-lg font-bold text-gray-900 mb-2">Stomatologji e Përgjithshme</h3>
+                            <p class="text-gray-500 text-sm">Kujdes parandalues, mbushje dhe trajtime për shëndet optimal.</p>
+                        </div>
+                        <div class="bg-white rounded-2xl p-6 shadow-sm hover:shadow-md transition text-center border border-gray-100 flex flex-col items-center">
+                            <div class="w-14 h-14 mx-auto bg-pink-50 rounded-full flex items-center justify-center mb-4"><i class="fa-solid fa-wand-magic-sparkles text-xl text-pink-600"></i></div>
+                            <h3 class="text-lg font-bold text-gray-900 mb-2">Estetikë Dentare</h3>
+                            <p class="text-gray-500 text-sm">Zbardhim profesional dhe dizenjim për të rikthyer shkëlqimin.</p>
+                        </div>
+                        <div class="bg-white rounded-2xl p-6 shadow-sm hover:shadow-md transition text-center border border-gray-100 flex flex-col items-center">
+                            <div class="w-14 h-14 mx-auto bg-gray-50 rounded-full flex items-center justify-center mb-4"><i class="fa-solid fa-screw-erd text-xl text-gray-600"></i></div>
+                            <h3 class="text-lg font-bold text-gray-900 mb-2">Implante Dentare</h3>
+                            <p class="text-gray-500 text-sm">Zëvendësim i përhershëm me planifikim 3D për estetikë dhe funksion.</p>
+                        </div>
+                        <div class="bg-white rounded-2xl p-6 shadow-sm hover:shadow-md transition text-center border border-gray-100 flex flex-col items-center">
+                            <div class="w-14 h-14 mx-auto bg-purple-50 rounded-full flex items-center justify-center mb-4"><i class="fa-solid fa-teeth-open text-xl text-purple-600"></i></div>
+                            <h3 class="text-lg font-bold text-gray-900 mb-2">Ortodonci</h3>
+                            <p class="text-gray-500 text-sm">Drejtim i dhëmbëve me aparate klasike ose transparente.</p>
+                        </div>
+                        <div class="bg-white rounded-2xl p-6 shadow-sm hover:shadow-md transition text-center border border-gray-100 flex flex-col items-center">
+                            <div class="w-14 h-14 mx-auto bg-yellow-50 rounded-full flex items-center justify-center mb-4"><i class="fa-solid fa-child text-xl text-yellow-600"></i></div>
+                            <h3 class="text-lg font-bold text-gray-900 mb-2">Stomatologji Pediatrike</h3>
+                            <p class="text-gray-500 text-sm">Kujdes i specializuar për fëmijët në një ambient miqësor.</p>
+                        </div>
+                        <div class="bg-white rounded-2xl p-6 shadow-sm hover:shadow-md transition text-center border border-gray-100 flex flex-col items-center">
+                            <div class="w-14 h-14 mx-auto bg-red-50 rounded-full flex items-center justify-center mb-4"><i class="fa-solid fa-syringe text-xl text-red-600"></i></div>
+                            <h3 class="text-lg font-bold text-gray-900 mb-2">Kirurgji Orale</h3>
+                            <p class="text-gray-500 text-sm">Ndërhyrje profesionale pa dhimbje dhe siguri absolute.</p>
+                        </div>
+                        <div class="bg-white rounded-2xl p-6 shadow-sm hover:shadow-md transition text-center border border-gray-100 flex flex-col items-center">
+                            <div class="w-14 h-14 mx-auto bg-teal-50 rounded-full flex items-center justify-center mb-4"><i class="fa-solid fa-tooth text-xl text-teal-600"></i></div>
+                            <h3 class="text-lg font-bold text-gray-900 mb-2">Endodonci (Kanalet)</h3>
+                            <p class="text-gray-500 text-sm">Trajtim i thellë dhe i saktë i nervit për të shpëtuar dhëmbët e dëmtuar rëndë.</p>
+                        </div>
+                        <div class="bg-white rounded-2xl p-6 shadow-sm hover:shadow-md transition text-center border border-gray-100 flex flex-col items-center">
+                            <div class="w-14 h-14 mx-auto bg-orange-50 rounded-full flex items-center justify-center mb-4"><i class="fa-solid fa-staff-snake text-xl text-orange-600"></i></div>
+                            <h3 class="text-lg font-bold text-gray-900 mb-2">Parodontologji</h3>
+                            <p class="text-gray-500 text-sm">Trajtim i mishrave të dhëmbëve dhe indeve mbështetëse për një bazë të shëndetshme.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="py-16 bg-white border-t border-gray-100">
+                <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                    <div class="flex flex-col md:flex-row justify-between items-center mb-12">
+                        <div class="text-center md:text-left mb-6 md:mb-0">
+                            <h2 class="text-3xl font-extrabold text-zen-dark">Çfarë thonë pacientët tanë</h2>
+                            <p class="mt-2 text-lg text-gray-600">Buzëqeshja juaj është prioriteti ynë. Lexoni përvojat e tyre.</p>
+                        </div>
+                        <button onclick="hapModalinEVleresimit()" class="bg-yellow-500 hover:bg-yellow-600 text-white font-bold py-3 px-6 rounded-full transition shadow flex items-center">
+                            <i class="fa-solid fa-pen mr-2"></i> Lër një Vlerësim
+                        </button>
+                    </div>
+                    
+                    <div id="listaVleresimeveFaqe" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                        <div class="col-span-full py-10 text-center text-gray-500"><i class="fa-solid fa-spinner fa-spin text-xl mb-2"></i><br>Duke ngarkuar vlerësimet...</div>
+                    </div>
+                </div>
+            </div>
+            
+        </div>
+
+        <div id="modalVleresimi" class="hidden fixed inset-0 bg-gray-900 bg-opacity-60 overflow-y-auto h-full w-full z-[60] flex items-center justify-center p-4">
+            <div class="bg-white p-8 rounded-2xl shadow-2xl max-w-md w-full relative">
+                <button onclick="mbyllModalinEVleresimit()" class="absolute top-4 right-4 text-gray-400 hover:text-gray-700 text-2xl">&times;</button>
+                <div class="text-center mb-6">
+                    <div class="inline-block p-3 rounded-full bg-yellow-50 mb-3"><i class="fa-solid fa-star text-3xl text-yellow-400"></i></div>
+                    <h3 class="text-2xl font-bold text-gray-900">Vlerësoni Përvojën Tuaj</h3>
+                    <p class="text-sm text-gray-500 mt-1">Mendimi juaj na ndihmon të ofrojmë shërbim akoma më të mirë.</p>
+                </div>
+                
+                <form id="formaVleresimitPacient" onsubmit="dergoVleresim(event)" class="space-y-5">
+                    <div class="text-center">
+                        <div class="star-rating inline-block">
+                            <input type="radio" id="star5" name="rating" value="5" required/><label for="star5" title="5 yje"><i class="fa-solid fa-star"></i></label>
+                            <input type="radio" id="star4" name="rating" value="4"/><label for="star4" title="4 yje"><i class="fa-solid fa-star"></i></label>
+                            <input type="radio" id="star3" name="rating" value="3"/><label for="star3" title="3 yje"><i class="fa-solid fa-star"></i></label>
+                            <input type="radio" id="star2" name="rating" value="2"/><label for="star2" title="2 yje"><i class="fa-solid fa-star"></i></label>
+                            <input type="radio" id="star1" name="rating" value="1"/><label for="star1" title="1 yll"><i class="fa-solid fa-star"></i></label>
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Emri Juaj *</label>
+                        <input type="text" id="vleresimEmri" required placeholder="psh. Agon G." class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-yellow-400 outline-none">
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Komenti (Opsional)</label>
+                        <textarea id="vleresimKomenti" rows="3" placeholder="Si ishte përvoja juaj në klinikë?" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-yellow-400 outline-none resize-none"></textarea>
+                    </div>
+                    
+                    <button type="submit" id="btnDergoVleresim" class="w-full bg-gray-900 hover:bg-black text-white font-bold py-3 rounded-xl transition shadow-lg mt-2">Dërgo Vlerësimin</button>
+                </form>
+                
+                <div id="vleresimSukses" class="hidden text-center py-6">
+                    <i class="fa-solid fa-circle-check text-5xl text-green-500 mb-3"></i>
+                    <h4 class="text-xl font-bold text-gray-900">Faleminderit!</h4>
+                    <p class="text-gray-600 mt-2">Vlerësimi juaj u dërgua me sukses! Së shpejti do të shqyrtohet nga stafi ynë.</p>
+                    <button onclick="mbyllModalinEVleresimit()" class="mt-6 text-gray-500 hover:text-gray-800 underline">Mbyll dritaren</button>
+                </div>
+            </div>
+        </div>
+
+        <div id="galeria" class="page-section hidden py-12 px-4 sm:px-6 lg:px-8 bg-[#FAF7F2]">
+            <div class="max-w-7xl mx-auto">
+                <div class="text-center mb-12">
+                    <h2 class="text-3xl font-extrabold text-zen-dark mb-4">Galeria</h2>
+                    <p class="text-gray-600 text-lg max-w-2xl mx-auto">Shikoni transformimet e vërteta të pacientëve tanë dhe zbuloni fuqinë e një buzëqeshjeje të re.</p>
+                    <p class="text-green-600 text-sm mt-2"><i class="fa-solid fa-magnifying-glass-plus mr-1"></i> Klikoni mbi fotot për t'i zmadhuar!</p>
+                </div>
+                
+                <div id="listaGaleria" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                    <div class="col-span-full text-center py-10 text-gray-500">
+                        <i class="fa-solid fa-spinner fa-spin text-2xl mb-2"></i><br>
+                        Duke ngarkuar galerinë...
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="smileAssessment" class="page-section hidden py-12 px-4 sm:px-6 lg:px-8">
+            <div class="max-w-3xl mx-auto">
+                <div class="text-center mb-10">
+                    <h2 class="text-3xl font-extrabold text-zen-dark mb-4">✨ Vlerësimi Digjital i Buzëqeshjes</h2>
+                    <p class="text-gray-600 text-lg">Ngarkoni një foto të dhëmbëve tuaj dhe mjekët tanë do t'ju kontaktojnë me një plan paraprak trajtimi.</p>
+                </div>
+
+                <div class="bg-white rounded-2xl shadow-lg p-8 border border-gray-100">
+                    <form id="formaVleresimitSmile" onsubmit="submitSmileAssessment(event)" class="space-y-6">
+                        <div id="smileForm">
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">Emri dhe Mbiemri *</label>
+                                    <input type="text" id="smileEmri" required class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-green-500 focus:border-green-500 outline-none transition bg-gray-50">
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">Telefoni ose Email *</label>
+                                    <input type="text" id="smileKontakti" required class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-green-500 focus:border-green-500 outline-none transition bg-gray-50">
+                                </div>
+                            </div>
+
+                            <div class="mb-6">
+                                <label class="block text-sm font-medium text-gray-700 mb-3">Çfarë dëshironi të përmirësoni? (Zgjidhni një ose më shumë)</label>
+                                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                    <label class="flex items-center space-x-3 p-3 border rounded-lg hover:bg-gray-50 cursor-pointer transition">
+                                        <input type="checkbox" value="Drejtimin e dhëmbëve" class="h-4 w-4 text-green-600 border-gray-300 rounded focus:ring-green-500">
+                                        <span class="text-gray-700 text-sm font-medium">Drejtimin e dhëmbëve</span>
+                                    </label>
+                                    <label class="flex items-center space-x-3 p-3 border rounded-lg hover:bg-gray-50 cursor-pointer transition">
+                                        <input type="checkbox" value="Zbardhimin / Shkëlqimin" class="h-4 w-4 text-green-600 border-gray-300 rounded focus:ring-green-500">
+                                        <span class="text-gray-700 text-sm font-medium">Zbardhimin / Shkëlqimin</span>
+                                    </label>
+                                    <label class="flex items-center space-x-3 p-3 border rounded-lg hover:bg-gray-50 cursor-pointer transition">
+                                        <input type="checkbox" value="Zëvendësimin e dhëmbëve" class="h-4 w-4 text-green-600 border-gray-300 rounded focus:ring-green-500">
+                                        <span class="text-gray-700 text-sm font-medium">Zëvendësimin e dhëmbëve</span>
+                                    </label>
+                                    <label class="flex items-center space-x-3 p-3 border rounded-lg hover:bg-gray-50 cursor-pointer transition">
+                                        <input type="checkbox" value="Formën e dhëmbëve (Faseta)" class="h-4 w-4 text-green-600 border-gray-300 rounded focus:ring-green-500">
+                                        <span class="text-gray-700 text-sm font-medium">Formën (Faseta/Veneers)</span>
+                                    </label>
+                                </div>
+                            </div>
+
+                            <div class="mb-8">
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Ngarkoni një foto të buzëqeshjes (Opsionale)</label>
+                                <div class="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-gray-300 border-dashed rounded-xl hover:border-green-500 transition cursor-pointer bg-gray-50 relative" onclick="document.getElementById('smileFoto').click()">
+                                    <div class="space-y-1 text-center">
+                                        <i class="fa-solid fa-camera text-4xl text-gray-400 mb-3"></i>
+                                        <div class="flex text-sm text-gray-600 justify-center">
+                                            <span class="relative rounded-md font-medium text-green-600 hover:text-green-500">
+                                                <span>Zgjidhni një foto nga pajisja</span>
+                                            </span>
+                                        </div>
+                                        <p class="text-xs text-gray-500">PNG, JPG deri në 10MB</p>
+                                    </div>
+                                    <input id="smileFoto" type="file" accept="image/*" class="sr-only" onchange="shfaqEmrinEFotos(this)">
+                                </div>
+                                
+                                <div id="fotoEmriContainer" class="hidden mt-3 p-3 bg-green-50 border border-green-200 rounded-lg flex items-center">
+                                    <i class="fa-solid fa-circle-check text-green-600 mr-2 text-lg"></i>
+                                    <span id="fotoEmri" class="text-sm font-medium text-green-800"></span>
+                                </div>
+                            </div>
+
+                            <button type="submit" id="btnSmile" class="w-full btn-primary text-lg font-semibold py-4 shadow-lg">
+                                Dërgo për Vlerësim
+                            </button>
+                        </div>
+                        
+                        <div id="smileSuksesi" class="hidden text-center py-10">
+                            <div class="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
+                                <i class="fa-solid fa-check text-4xl text-green-600"></i>
+                            </div>
+                            <h3 class="text-2xl font-bold text-gray-900 mb-2">Faleminderit!</h3>
+                            <p class="text-gray-600">Kërkesa juaj për vlerësim u dërgua me sukses. Mjekët tanë do ta shqyrtojnë dhe t'ju kontaktojnë së shpejti.</p>
+                            <button type="button" onclick="ndrroFaqen('faqjaKryesore')" class="mt-8 text-green-600 font-medium hover:text-green-800 underline">Kthehu në Ballinë</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <div id="rezervoTermin" class="page-section hidden py-12 px-4 sm:px-6 lg:px-8">
+            <div class="max-w-2xl mx-auto">
+                <div class="text-center mb-10">
+                    <h2 class="text-3xl font-extrabold text-zen-dark mb-4">📅 Rezervo Terminin Online</h2>
+                    <p class="text-gray-600 text-lg">Plotësoni formën e mëposhtme për të caktuar vizitën tuaj.</p>
+                </div>
+
+                <div class="bg-white rounded-2xl shadow-lg p-8 border border-gray-100">
+                    <form id="rezervimiForma" onsubmit="submitForm(event)" class="space-y-6">
+                        
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Emri dhe Mbiemri *</label>
+                            <input type="text" id="emri" required class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-green-500 focus:border-green-500 outline-none transition bg-gray-50">
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Numri i Telefonit *</label>
+                            <input type="tel" id="telefoni" required placeholder="psh. 044123456" 
+                                oninput="this.value = this.value.replace(/[^0-9+ ]/g, '')"
+                                class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-green-500 focus:border-green-500 outline-none transition bg-gray-50">
+                        </div>
+
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Mjeku i Preferuar</label>
+                                <select id="mjeku" class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-green-500 focus:border-green-500 outline-none transition bg-gray-50 appearance-none">
+                                    <option value="Çdo Mjek">Cili të jetë i lirë</option>
+                                    <option value="Duke ngarkuar...">Duke ngarkuar mjekët...</option>
+                                </select>
+                            </div>
+
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Shërbimi</label>
+                                <select id="sherbimi" class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-green-500 focus:border-green-500 outline-none transition bg-gray-50 appearance-none">
+                                    <option>Stomatologji e Përgjithshme</option>
+                                    <option>Estetikë Dentare (Faseta/Zbardhim)</option>
+                                    <option>Implante Dentare</option>
+                                    <option>Ortodonci</option>
+                                    <option>Stomatologji Pediatrike</option>
+                                    <option>Kirurgji Orale</option>
+                                    <option>Estetikë (Veneers / Bonding / Zbardhim)</option>
+                                    <option>E Përgjithshme (Pastrim / Kurora / Ura)</option>
+                                    <option>Emergjencë (Trajtim Kanalor / Mishrat)</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Data e Preferuar *</label>
+                                <input type="date" id="data_preferuar" required class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-green-500 focus:border-green-500 outline-none transition bg-gray-50">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Koha e Preferuar</label>
+                                <select id="koha_preferuar" class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-green-500 focus:border-green-500 outline-none transition bg-gray-50 appearance-none">
+                                    <option>Mëngjes (09:00 - 12:00)</option>
+                                    <option>Mesditë (12:00 - 15:00)</option>
+                                    <option>Pasdite (15:00 - 18:00)</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <button type="submit" id="formBtn" class="w-full btn-primary text-lg font-semibold py-4 shadow-lg mt-4">
+                            Konfirmo Rezervimin
+                        </button>
+                    </form>
+
+                    <div id="mesazhiSuksesit" class="hidden text-center py-10">
+                        <div class="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
+                            <i class="fa-solid fa-calendar-check text-4xl text-green-600"></i>
+                        </div>
+                        <h3 class="text-2xl font-bold text-gray-900 mb-2">Rezervimi u Dërgua!</h3>
+                        <p class="text-gray-600">Faleminderit <strong id="emriSukses"></strong>. Ne do t'ju kontaktojmë së shpejti për të konfirmuar orarin tuaj të saktë.</p>
+                        <button onclick="ndrroFaqen('faqjaKryesore')" class="mt-8 text-green-600 font-medium hover:text-green-800 underline">Kthehu në Ballinë</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="kontakt" class="page-section hidden py-12 px-4 sm:px-6 lg:px-8">
+            <div class="max-w-7xl mx-auto">
+                <div class="text-center mb-12">
+                    <h2 class="text-3xl font-extrabold text-zen-dark mb-4">Njihuni me Ekipin Tonë</h2>
+                    <p class="text-gray-600 text-lg max-w-2xl mx-auto">Ekspertë të përkushtuar për t'ju ofruar kujdesin më të mirë dentar, duke kombinuar përvojën me teknologjinë moderne.</p>
+                </div>
+                
+                <div id="listaEkipit" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-7xl mx-auto mb-20">
+                    <div class="col-span-full text-center py-10 text-gray-500">
+                        <i class="fa-solid fa-spinner fa-spin text-2xl mb-2"></i><br>
+                        Duke ngarkuar stafin nga serveri...
+                    </div>
+                </div>
+
+                <div class="bg-white rounded-3xl shadow-xl overflow-hidden border border-gray-100">
+                    <div class="grid grid-cols-1 lg:grid-cols-2">
+                        <div class="h-96 lg:h-auto w-full relative">
+                            <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2946.0097495908233!2d21.1469374!3d42.3653139!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x13547eb0004051a5%3A0xcbe666322d56a22d!2sZEN%20DENTAL%20CLINIC!5e0!3m2!1sen!2s!4v1715690000000!5m2!1sen!2s" width="100%" height="100%" style="border:0; min-height: 400px;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade" class="absolute inset-0"></iframe>
+                        </div>
+                        
+                        <div class="p-8 lg:p-12 flex flex-col justify-center bg-zen-dark text-white">
+                            <h2 class="text-3xl font-bold mb-8">Na Vizitoni</h2>
+                            
+                            <div class="space-y-6">
+                                <div class="flex items-start">
+                                    <div class="w-12 h-12 bg-white/10 rounded-full flex items-center justify-center flex-shrink-0 mr-4">
+                                        <i class="fa-solid fa-location-dot text-xl text-green-400"></i>
+                                    </div>
+                                    <div>
+                                        <h4 class="text-lg font-semibold text-green-100">Adresa</h4>
+                                        <p class="text-gray-300 mt-1">Rr Ismet Ramadani<br>70000 Ferizaj, Kosovë</p>
+                                    </div>
+                                </div>
+                                <div class="flex items-start">
+                                    <div class="w-12 h-12 bg-white/10 rounded-full flex items-center justify-center flex-shrink-0 mr-4">
+                                        <i class="fa-solid fa-phone text-xl text-green-400"></i>
+                                    </div>
+                                    <div>
+                                        <h4 class="text-lg font-semibold text-green-100">Telefoni & Email</h4>
+                                        <p class="text-gray-300 mt-1">+383 46 777 123<br>info@zendental.com</p>
+                                    </div>
+                                </div>
+                                <div class="flex items-start">
+                                    <div class="w-12 h-12 bg-white/10 rounded-full flex items-center justify-center flex-shrink-0 mr-4">
+                                        <i class="fa-regular fa-clock text-xl text-green-400"></i>
+                                    </div>
+                                    <div>
+                                        <h4 class="text-lg font-semibold text-green-100">Orari i Punës</h4>
+                                        <p class="text-gray-300 mt-1">E Hënë - E Premte: 09:00 - 18:00<br>E Shtunë: 09:00 - 14:00<br>E Diel: Pushim</p>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="mt-10">
+                                <button onclick="ndrroFaqen('rezervoTermin')" class="w-full bg-green-500 hover:bg-green-600 text-white font-medium py-4 px-6 rounded-xl transition shadow-lg flex items-center justify-center text-lg">
+                                    <i class="fa-regular fa-calendar-check mr-2"></i> Rezervo Vizitën Tani
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="lightbox" class="hidden fixed inset-0 bg-black bg-opacity-95 z-[100] flex flex-col items-center justify-center p-4" onclick="mbyllLightboxNgaSfondi(event)">
+            <button class="absolute top-4 right-6 text-white text-5xl font-light hover:text-gray-300 transition z-50" onclick="mbyllLightbox()">&times;</button>
+            
+            <button id="btnLightboxPara" class="absolute left-2 sm:left-8 top-1/2 transform -translate-y-1/2 text-white text-4xl sm:text-5xl p-4 hover:text-gray-400 transition z-50 cursor-pointer drop-shadow-lg" onclick="ndrroImazh(-1, event)">
+                <i class="fa-solid fa-chevron-left"></i>
+            </button>
+            
+            <button id="btnLightboxPas" class="absolute right-2 sm:right-8 top-1/2 transform -translate-y-1/2 text-white text-4xl sm:text-5xl p-4 hover:text-gray-400 transition z-50 cursor-pointer drop-shadow-lg" onclick="ndrroImazh(1, event)">
+                <i class="fa-solid fa-chevron-right"></i>
+            </button>
+
+            <img id="lightboxImage" src="" class="max-h-[90vh] max-w-[95vw] object-contain rounded-lg shadow-2xl transition-transform duration-300 transform scale-95 relative z-40" alt="Zmadhimi">
+        </div>
+
+    </main>
+
+    <footer class="bg-white border-t border-gray-200 mt-12">
+        <div class="max-w-7xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
+            <div class="md:flex md:items-center md:justify-between">
+                <div class="flex justify-center md:justify-end space-x-6 md:order-2 items-center flex-wrap gap-y-4 sm:gap-y-0">
+                    <a href="https://facebook.com" target="_blank" class="text-gray-400 hover:text-blue-600 transition transform hover:scale-110" title="Facebook">
+                        <i class="fa-brands fa-facebook text-2xl"></i>
+                    </a>
+                    <a href="https://instagram.com" target="_blank" class="text-gray-400 hover:text-pink-600 transition transform hover:scale-110" title="Instagram">
+                        <i class="fa-brands fa-instagram text-2xl"></i>
+                    </a>
+                    <div class="w-px h-6 bg-gray-300 hidden sm:block"></div>
+                    <span class="text-gray-400 hover:text-gray-500 flex items-center">
+                        <i class="fa-solid fa-location-dot mr-2"></i> Ferizaj, Kosovë
+                    </span>
+                    <span class="text-gray-400 hover:text-gray-500 flex items-center">
+                        <i class="fa-solid fa-phone mr-2"></i> +383 46 777 123
+                    </span>
+                </div>
+                <div class="mt-8 md:mt-0 md:order-1 flex items-center justify-center md:justify-start space-x-4">
+                <p class="text-center text-gray-400 text-sm">
+                    &copy; <span id="viti-aktual"></span> Zen Dental. Të gjitha të drejtat e rezervuara.
+                </p>
+                <a href="admin.html" target="_blank" class="text-gray-300 hover:text-gray-500 text-sm transition" title="Hyrja për Stafin"><i class="fa-solid fa-lock"></i></a>
+            </div>
+        </div>
+    </footer>
+
+    <a href="https://wa.me/38346777123" target="_blank" class="fixed bottom-6 right-6 bg-green-500 text-white p-4 rounded-full shadow-lg hover:bg-green-600 hover:scale-110 transition-transform z-50 flex items-center justify-center">
+        <i class="fa-brands fa-whatsapp text-3xl"></i>
+    </a>
+
+    <script>
+        let galeriaImazheList = [];
+        let indeksiImazhitAktual = 0;
+        let menujaE_Hapur = false;
+
+        function toggleMobileMenu() {
+            const menu = document.getElementById('mobileMenu');
+            const icon = document.getElementById('menuIcon');
+            menujaE_Hapur = !menujaE_Hapur;
+
+            if (menujaE_Hapur) {
+                menu.classList.remove('hidden');
+                menu.classList.add('block');
+                setTimeout(() => {
+                    menu.classList.remove('opacity-0', 'scale-y-0');
+                    menu.classList.add('opacity-100', 'scale-y-100');
+                }, 10);
+                icon.classList.remove('fa-bars');
+                icon.classList.add('fa-xmark');
+            } else {
+                menu.classList.remove('opacity-100', 'scale-y-100');
+                menu.classList.add('opacity-0', 'scale-y-0');
+                icon.classList.remove('fa-xmark');
+                icon.classList.add('fa-bars'); 
+                setTimeout(() => {
+                    if(!menujaE_Hapur) {
+                        menu.classList.remove('block');
+                        menu.classList.add('hidden');
+                    }
+                }, 300);
+            }
+        }
+
+        function ndrroFaqenMobile(idEFaqes) {
+            ndrroFaqen(idEFaqes);
+            if(menujaE_Hapur) toggleMobileMenu();
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const sot = new Date().toISOString().split('T')[0];
+            document.getElementById('data_preferuar').setAttribute('min', sot);
+            document.getElementById('viti-aktual').textContent = new Date().getFullYear();
+            
+            ngarkoMjeket();
+            ngarkoVleresimetFaqe();
+        });
+
+        function ndrroFaqen(idEFaqes) {
+            document.querySelectorAll('.page-section').forEach(sec => sec.classList.add('hidden'));
+            document.getElementById(idEFaqes).classList.remove('hidden');
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+            
+            const menyte = ['faqjaKryesore', 'kontakt', 'galeria', 'smileAssessment'];
+            menyte.forEach(id => {
+                const btn = document.getElementById('nav-' + id);
+                if (btn) {
+                    if (id === idEFaqes) {
+                        btn.className = "text-green-700 font-bold transition border-b-2 border-green-700 pb-1" + (id === 'smileAssessment' ? " flex items-center" : "");
+                    } else {
+                        btn.className = "text-gray-600 hover:text-green-700 font-medium transition border-b-2 border-transparent pb-1" + (id === 'smileAssessment' ? " flex items-center" : "");
+                    }
+                }
+            });
+            
+            if (idEFaqes === 'kontakt') ngarkoEkipinNgaDatabaza();
+            if (idEFaqes === 'rezervoTermin') ngarkoMjeket();
+            if (idEFaqes === 'galeria') ngarkoGaleria();
+        }
+        
+        function hapLightbox(indeks) {
+            indeksiImazhitAktual = indeks;
+            const lightbox = document.getElementById('lightbox');
+            const img = document.getElementById('lightboxImage');
+            
+            img.src = galeriaImazheList[indeksiImazhitAktual];
+            
+            document.getElementById('btnLightboxPara').style.display = indeksiImazhitAktual > 0 ? 'block' : 'none';
+            document.getElementById('btnLightboxPas').style.display = indeksiImazhitAktual < galeriaImazheList.length - 1 ? 'block' : 'none';
+
+            lightbox.classList.remove('hidden');
+            setTimeout(() => img.classList.replace('scale-95', 'scale-100'), 10);
+        }
+
+        function mbyllLightbox() {
+            const lightbox = document.getElementById('lightbox');
+            const img = document.getElementById('lightboxImage');
+            img.classList.replace('scale-100', 'scale-95');
+            setTimeout(() => lightbox.classList.add('hidden'), 200);
+        }
+
+        function mbyllLightboxNgaSfondi(event) {
+            if (event.target.id === 'lightbox') {
+                mbyllLightbox();
+            }
+        }
+
+        function ndrroImazh(drejtimi, event) {
+            if (event) event.stopPropagation();
+            const indeksIRi = indeksiImazhitAktual + drejtimi;
+            if (indeksIRi >= 0 && indeksIRi < galeriaImazheList.length) {
+                hapLightbox(indeksIRi);
+            }
+        }
+
+        document.addEventListener('keydown', function(event) {
+            const lightbox = document.getElementById('lightbox');
+            if (!lightbox.classList.contains('hidden')) {
+                if (event.key === 'ArrowLeft') ndrroImazh(-1, null);
+                if (event.key === 'ArrowRight') ndrroImazh(1, null);
+                if (event.key === 'Escape') mbyllLightbox();
+            }
+        });
+
+        async function ngarkoGaleria() {
+            const container = document.getElementById('listaGaleria');
+            container.innerHTML = '<div class="col-span-full text-center py-10 text-gray-500"><i class="fa-solid fa-spinner fa-spin text-2xl mb-2"></i><br>Duke ngarkuar...</div>';
+            try {
+                const res = await fetch('http://localhost:8000/api/galeria');
+                if (!res.ok) throw new Error();
+                const data = await res.json();
+                if (data.length === 0) {
+                    container.innerHTML = '<div class="col-span-full text-center text-gray-500">Galeria është bosh për momentin.</div>';
+                    return;
+                }
+                container.innerHTML = ''; 
+                galeriaImazheList = []; 
+                
+                data.forEach(item => {
+                    const fotoPara = item.foto_para_url.startsWith('http') ? item.foto_para_url : `http://localhost:8000/${item.foto_para_url}`;
+                    const fotoPas = item.foto_pas_url.startsWith('http') ? item.foto_pas_url : `http://localhost:8000/${item.foto_pas_url}`;
+                    
+                    const indeksPara = galeriaImazheList.length;
+                    galeriaImazheList.push(fotoPara);
+                    const indeksPas = galeriaImazheList.length;
+                    galeriaImazheList.push(fotoPas);
+                    
+                    container.innerHTML += `
+                        <div class="bg-white rounded-2xl shadow-md border border-gray-100 overflow-hidden hover:shadow-lg transition-shadow duration-300">
+                            <div class="grid grid-cols-2 gap-1 bg-gray-200">
+                                <div class="relative group overflow-hidden cursor-pointer" onclick="hapLightbox(${indeksPara})">
+                                    <img src="${fotoPara}" alt="Foto 1" class="w-full h-48 sm:h-56 object-cover object-center transform transition-transform duration-700 group-hover:scale-125">
+                                    <div class="absolute inset-0 bg-black bg-opacity-10 group-hover:bg-opacity-0 transition duration-500"></div>
+                                    <div class="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-20 pointer-events-none">
+                                        <i class="fa-solid fa-expand text-white text-3xl drop-shadow-md"></i>
+                                    </div>
+                                </div>
+                                <div class="relative group overflow-hidden cursor-pointer" onclick="hapLightbox(${indeksPas})">
+                                    <img src="${fotoPas}" alt="Foto 2" class="w-full h-48 sm:h-56 object-cover object-center transform transition-transform duration-700 group-hover:scale-125">
+                                    <div class="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-10 transition duration-500"></div>
+                                    <div class="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-20 pointer-events-none">
+                                        <i class="fa-solid fa-expand text-white text-3xl drop-shadow-md"></i>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="p-6">
+                                <h3 class="text-xl font-bold text-gray-900 mb-2">${item.titulli}</h3>
+                                <p class="text-gray-600 text-sm">${item.pershkrimi}</p>
+                            </div>
+                        </div>
+                    `;
+                });
+            } catch (error) {
+                container.innerHTML = '<div class="col-span-full text-center text-red-500 font-medium">Nuk mundëm të ngarkojmë galerinë.</div>';
+            }
+        }
+
+        async function ngarkoMjeket() {
+            const dropdown = document.getElementById('mjeku');
+            try {
+                const res = await fetch('http://localhost:8000/api/stafi');
+                if (!res.ok) throw new Error();
+                const stafi = await res.json();
+                dropdown.innerHTML = '<option value="Çdo Mjek">Cili të jetë i lirë</option>';
+                stafi.forEach(m => {
+                    dropdown.innerHTML += `<option value="${m.emri}">${m.emri} - ${m.roli}</option>`;
+                });
+            } catch (error) {
+                dropdown.innerHTML = '<option value="Çdo Mjek">Cili të jetë i lirë (Klinika)</option>';
+            }
+        }
+
+        async function ngarkoEkipinNgaDatabaza() {
+            const container = document.getElementById('listaEkipit');
+            container.innerHTML = '<div class="col-span-full text-center py-10 text-gray-500"><i class="fa-solid fa-spinner fa-spin text-2xl mb-2"></i><br>Duke ngarkuar ekipin...</div>';
+            try {
+                const res = await fetch('http://localhost:8000/api/stafi');
+                if (!res.ok) throw new Error();
+                const stafi = await res.json();
+                if (stafi.length === 0) {
+                    container.innerHTML = '<div class="col-span-full text-center text-gray-500">Stafi do të përditësohet së shpejti.</div>';
+                    return;
+                }
+                container.innerHTML = ''; 
+                stafi.forEach(m => {
+                    const fotoUrl = m.foto_url ? `http://localhost:8000/${m.foto_url}` : `https://ui-avatars.com/api/?name=${encodeURIComponent(m.emri)}&background=3B5249&color=fff&size=512`;
+                    container.innerHTML += `
+                        <div class="bg-white rounded-3xl shadow-lg border border-gray-100 overflow-hidden hover:-translate-y-2 transition-transform duration-300 flex flex-col">
+                            <img src="${fotoUrl}" alt="${m.emri}" class="w-full aspect-[4/5] object-cover object-top bg-gray-100">
+                            <div class="p-8 text-center bg-white relative flex-grow flex flex-col">
+                                <div class="absolute -top-8 left-1/2 transform -translate-x-1/2 w-16 h-16 bg-zen-dark rounded-full flex items-center justify-center border-4 border-white shadow-sm">
+                                    <i class="fa-solid fa-user-md text-2xl text-green-400"></i>
+                                </div>
+                                <h3 class="text-2xl font-bold text-gray-900 mt-4">${m.emri}</h3>
+                                <p class="text-green-600 font-bold text-sm mb-4 uppercase tracking-wider">${m.roli}</p>
+                                <p class="text-gray-500 text-sm flex-grow">${m.pershkrimi}</p>
+                            </div>
+                        </div>
+                    `;
+                });
+            } catch (error) {
+                container.innerHTML = '<div class="col-span-full text-center text-red-500 font-medium">Nuk mundëm të lidhemi me databazën e klinikës.<br><span class="text-sm text-gray-400">Sigurohuni që serveri është i ndezur.</span></div>';
+            }
+        }
+
+        async function ngarkoVleresimetFaqe() {
+            const container = document.getElementById('listaVleresimeveFaqe');
+            try {
+                const res = await fetch('http://localhost:8000/api/vleresimet/aprovuara');
+                if (!res.ok) throw new Error();
+                const data = await res.json();
+                
+                if (data.length === 0) {
+                    container.innerHTML = '<div class="col-span-full text-center text-gray-500 italic">Bëhu pacienti i parë që lë një vlerësim!</div>';
+                    return;
+                }
+
+                container.innerHTML = '';
+                data.forEach(v => {
+                    let yjetHtml = '';
+                    for(let i=0; i<5; i++) {
+                        yjetHtml += i < v.yje ? '<i class="fa-solid fa-star text-yellow-400"></i>' : '<i class="fa-regular fa-star text-gray-200"></i>';
+                    }
+                    
+                    container.innerHTML += `
+                        <div class="bg-white rounded-2xl p-6 shadow-sm hover:shadow-md transition border border-gray-100 flex flex-col h-full">
+                            <div class="flex items-center space-x-3 mb-3">
+                                <div class="w-10 h-10 rounded-full bg-yellow-50 text-yellow-600 flex items-center justify-center font-bold text-base border border-yellow-100">
+                                    ${v.emri.charAt(0).toUpperCase()}
+                                </div>
+                                <div>
+                                    <h4 class="font-bold text-gray-900 text-sm leading-tight">${v.emri}</h4>
+                                    <span class="text-[10px] text-gray-500 uppercase tracking-wide"><i class="fa-solid fa-circle-check text-green-500 mr-1"></i>Verifikuar</span>
+                                </div>
+                            </div>
+                            <div class="mb-2 text-sm">${yjetHtml}</div>
+                            <p class="text-gray-600 text-sm italic flex-grow">"${v.komenti}"</p>
+                            <div class="mt-3 pt-3 border-t border-gray-50 text-[11px] text-gray-400 text-right">
+                                ${v.data.split(' ')[0]}
+                            </div>
+                        </div>
+                    `;
+                });
+            } catch (error) {
+                container.innerHTML = '<div class="col-span-full text-center text-red-500 text-sm">Probleme në ngarkimin e komenteve.</div>';
+            }
+        }
+
+        function hapModalinEVleresimit() {
+            document.getElementById('formaVleresimitPacient').reset();
+            document.getElementById('formaVleresimitPacient').classList.remove('hidden');
+            document.getElementById('vleresimSukses').classList.add('hidden');
+            document.getElementById('modalVleresimi').classList.remove('hidden');
+        }
+
+        function mbyllModalinEVleresimit() {
+            document.getElementById('modalVleresimi').classList.add('hidden');
+        }
+
+        async function dergoVleresim(event) {
+            event.preventDefault();
+            
+            const emri = document.getElementById('vleresimEmri').value;
+            const komenti = document.getElementById('vleresimKomenti').value;
+            const yjetInput = document.querySelector('input[name="rating"]:checked');
+            
+            if(!yjetInput) {
+                alert("Ju lutem zgjidhni një vlerësim me yje!");
+                return;
+            }
+            
+            const btn = document.getElementById('btnDergoVleresim');
+            const originalText = btn.innerHTML;
+            btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Po dërgohet...';
+
+            try {
+                const res = await fetch('http://localhost:8000/api/vleresimet', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ emri: emri, komenti: komenti, yje: parseInt(yjetInput.value) })
+                });
+
+                if (res.ok) {
+                    document.getElementById('formaVleresimitPacient').classList.add('hidden');
+                    document.getElementById('vleresimSukses').classList.remove('hidden');
+                } else {
+                    alert("Ndodhi një gabim gjatë dërgimit.");
+                }
+            } catch (error) {
+                alert("Nuk mund të lidhemi me serverin. Provoni përsëri më vonë.");
+            }
+            btn.innerHTML = originalText;
+        }
+
+        function submitForm(event) {
+            event.preventDefault();
+            const emri = document.getElementById('emri').value;
+            const formBtn = document.getElementById('formBtn');
+            const dataOrigjinaleBtn = formBtn.innerHTML;
+            
+            formBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin mr-2"></i> Duke u dërguar...';
+            const formData = {
+                emri: document.getElementById('emri').value,
+                telefoni: document.getElementById('telefoni').value,
+                mjeku: document.getElementById('mjeku').value,
+                sherbimi: document.getElementById('sherbimi').value,
+                data_preferuar: document.getElementById('data_preferuar').value,
+                koha_preferuar: document.getElementById('koha_preferuar').value
+            };
+
+            fetch('http://localhost:8000/api/booking', {
+                method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(formData)
+            })
+            .then(response => {
+                if (response.ok) {
+                    document.getElementById('rezervimiForma').classList.add('hidden');
+                    document.getElementById('mesazhiSuksesit').classList.remove('hidden');
+                    document.getElementById('emriSukses').textContent = emri;
+                } else { alert("Ndodhi një gabim gjatë dërgimit."); formBtn.innerHTML = dataOrigjinaleBtn; }
+            })
+            .catch(error => { alert("Nuk mund të lidhemi me serverin e klinikës."); formBtn.innerHTML = dataOrigjinaleBtn; });
+        }
+
+        async function submitSmileAssessment(event) {
+            event.preventDefault();
+            const btn = document.getElementById('btnSmile');
+            const dataOrigjinaleBtn = btn.innerHTML;
+            btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin mr-2"></i> Duke ngarkuar...';
+
+            const formData = new FormData();
+            formData.append('emri', document.getElementById('smileEmri').value);
+            formData.append('kontakti', document.getElementById('smileKontakti').value);
+            
+            const qellimet = [];
+            document.querySelectorAll('input[type="checkbox"]:checked').forEach(cb => { qellimet.push(cb.value); });
+            formData.append('problemi', qellimet.join(', '));
+            
+            const fileInput = document.getElementById('smileFoto');
+            if(fileInput.files.length > 0) formData.append('file', fileInput.files[0]);
+
+            try {
+                const response = await fetch('http://localhost:8000/api/smile', { method: 'POST', body: formData });
+                if (response.ok) {
+                    document.getElementById('smileForm').classList.add('hidden');
+                    document.getElementById('smileSuksesi').classList.remove('hidden');
+                } else { alert("Gabim në server gjatë dërgimit."); btn.innerHTML = dataOrigjinaleBtn; }
+            } catch (error) { alert("Nuk mund të lidhemi me serverin e klinikës."); btn.innerHTML = dataOrigjinaleBtn; }
+        }
+
+        function shfaqEmrinEFotos(input) {
+            const container = document.getElementById('fotoEmriContainer');
+            const emerSpan = document.getElementById('fotoEmri');
+            if (input.files && input.files.length > 0) {
+                const emri = input.files[0].name;
+                emerSpan.textContent = ' U ngarkua: ' + emri;
+                container.classList.remove('hidden');
+                container.classList.add('flex');
+            } else { container.classList.add('hidden'); container.classList.remove('flex'); }
+        }
+    </script>
+</body>
+</html>
