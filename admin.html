@@ -24,7 +24,7 @@
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex items-center justify-between h-16">
                 <div class="flex items-center cursor-pointer" onclick="ndrroTabin('rezervime')">
-                    <img src="uploads/ZenDentalLogo.jpg" alt="Zen Dental Logo" class="h-10 w-auto bg-white p-1 rounded">
+                    <img src="uploads/ZenLogo.jpeg" alt="Zen Dental Logo" class="h-10 w-auto bg-white p-1 rounded">
                 </div>
                 <div class="flex items-center space-x-3">
                     <button id="navStafi" onclick="ndrroTabin('stafi')" class="hidden text-sm bg-purple-600 hover:bg-purple-700 px-3 py-1.5 rounded transition shadow-sm">
@@ -200,7 +200,7 @@
                 </div>
             </div>
 
-            <!-- ZONA E DEDIKUAR PËR PRINTIMIN E BLERJEVE (E fshehur në ekran, e dukshme vetëm në letër) -->
+            <!-- ZONA E DEDIKUAR PËR PRINTIMIN E BLERJEVE -->
             <div id="zonaBlerjevePrint" class="hidden bg-white p-8 rounded-xl border">
                 <div class="text-center mb-8 border-b pb-4">
                     <h1 class="text-2xl font-bold text-gray-900"><i class="fa-solid fa-tooth text-green-500"></i> Zen Dental - Raporti i Blerjeve</h1>
@@ -606,6 +606,8 @@
     </div>
 
     <script>
+        const API_BASE = "https://LNK_I_RENDER_TEND"; // <--- Zëvendësoje me linkun tënd të Render
+
         document.addEventListener('DOMContentLoaded', () => {
             const savedRole = localStorage.getItem('mjekuRole');
             const savedName = localStorage.getItem('mjekuName');
@@ -634,7 +636,7 @@
             errorDiv.classList.add('hidden');
 
             try {
-                const response = await fetch('http://localhost:8000/api/login', {
+                const response = await fetch(API_BASE + '/api/login', {
                     method: 'POST', headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ username: usernameInput, password: passwordInput })
                 });
@@ -742,7 +744,7 @@
             const tabelaBody = document.getElementById('tabelaRezervimeve');
             tabelaBody.innerHTML = '<tr><td colspan="6" class="px-6 py-10 text-center text-gray-500"><i class="fa-solid fa-spinner fa-spin mr-2"></i> Duke ngarkuar...</td></tr>';
             try {
-                const response = await fetch(`http://localhost:8000/api/rezervimet/${encodeURIComponent(role)}`);
+                const response = await fetch(API_BASE + `/api/rezervimet/${encodeURIComponent(role)}`);
                 if(!response.ok) throw new Error("Gabim serveri");
                 const data = await response.json();
                 
@@ -770,7 +772,7 @@
             const tabelaBody = document.getElementById('tabelaArkiva');
             tabelaBody.innerHTML = '<tr><td colspan="4" class="px-6 py-10 text-center text-gray-500"><i class="fa-solid fa-spinner fa-spin mr-2"></i> Duke ngarkuar...</td></tr>';
             try {
-                const response = await fetch(`http://localhost:8000/api/arkiva/admin`);
+                const response = await fetch(API_BASE + `/api/arkiva/admin`);
                 if(!response.ok) throw new Error("Gabim serveri");
                 const data = await response.json();
                 
@@ -811,7 +813,7 @@
 
             tabelaBody.innerHTML = '<tr><td colspan="4" class="px-6 py-10 text-center text-gray-500"><i class="fa-solid fa-spinner fa-spin mr-2"></i> Duke ngarkuar shpenzimet...</td></tr>';
             try {
-                const response = await fetch(`http://localhost:8000/api/shpenzimet`);
+                const response = await fetch(API_BASE + `/api/shpenzimet`);
                 if(!response.ok) throw new Error("Gabim serveri");
                 let data = await response.json();
                 
@@ -864,7 +866,7 @@
             };
 
             try {
-                const res = await fetch('http://localhost:8000/api/shpenzimet', {
+                const res = await fetch(API_BASE + '/api/shpenzimet', {
                     method: 'POST', headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(payload)
                 });
@@ -884,7 +886,7 @@
         async function fshiShpenzim(id) {
             if(confirm("Jeni i sigurt që dëshironi ta fshini këtë shpenzim?")) {
                 try {
-                    await fetch(`http://localhost:8000/api/shpenzimet/${id}`, { method: 'DELETE' });
+                    await fetch(API_BASE + `/api/shpenzimet/${id}`, { method: 'DELETE' });
                     ngarkoShpenzimet();
                 } catch(e) { alert("Gabim gjatë fshirjes."); }
             }
@@ -901,7 +903,7 @@
             tabelaPrint.innerHTML = '<tr><td colspan="3" class="px-4 py-4 text-center text-gray-500">Duke përgatitur...</td></tr>';
 
             try {
-                const res = await fetch(`http://localhost:8000/api/shpenzimet`);
+                const res = await fetch(API_BASE + `/api/shpenzimet`);
                 let data = await res.json();
 
                 if (muajiZgjedhur !== 'all') {
@@ -926,8 +928,6 @@
                     });
                 }
                 document.getElementById('totaliBlerjevePrintStat').innerText = totalKostoja.toLocaleString() + " €";
-
-                // Hap dritaren e printimit direkt pas mbushjes së zonës së printimit
                 window.print();
             } catch(e) {
                 alert("Gabim gjatë përgatitjes për printim.");
@@ -977,7 +977,7 @@
                 }
                 btnRuaj.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Po ruhet...';
                 try {
-                    const res = await fetch(`http://localhost:8000/api/rezervimet/${rezervimiAktivId}/perfunduar`, {
+                    const res = await fetch(API_BASE + `/api/rezervimet/${rezervimiAktivId}/perfunduar`, {
                         method: 'POST', headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify({ shenime: shenime, cmimi: parseFloat(cmimiStr) })
                     });
@@ -1012,7 +1012,7 @@
                 }
                 btnRuaj.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Duke përditësuar...';
                 try {
-                    const res = await fetch(`http://localhost:8000/api/rezervimet/${editAktivId}/ndrysho`, {
+                    const res = await fetch(API_BASE + `/api/rezervimet/${editAktivId}/ndrysho`, {
                         method: 'POST', headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify({ shenime: shenimeTëReja, cmimi: parseFloat(cmimiIRi) })
                     });
@@ -1021,7 +1021,7 @@
                     ngarkoArkiven(); 
                 } catch(e) {
                     document.getElementById('errorEditimi').innerText = "Lidhja dështoi. Provoni përsëri.";
-                    document.getElementById('errorEditimi').classList.remove('hidden');
+                    document.getElementById('errorEditimi').classList.add('hidden');
                 }
                 btnRuaj.innerHTML = 'Përditëso';
             };
@@ -1033,7 +1033,7 @@
             const lista = document.getElementById('historiaLista');
             lista.innerHTML = 'Duke ngarkuar...';
             try {
-                const response = await fetch(`http://localhost:8000/api/historia/${encodeURIComponent(telefoni)}`);
+                const response = await fetch(API_BASE + `/api/historia/${encodeURIComponent(telefoni)}`);
                 if(!response.ok) throw new Error();
                 const data = await response.json();
                 if (data.length === 0) { lista.innerHTML = '<div class="p-4 text-center">Nuk ka histori të mëparshme.</div>'; return; }
@@ -1074,12 +1074,12 @@
             if(tabelaShpenzimeveRap) tabelaShpenzimeveRap.innerHTML = '<tr><td colspan="4" class="px-4 py-4 text-center text-gray-500">Duke kalkuluar...</td></tr>';
 
             try {
-                const resArkiva = await fetch(`http://localhost:8000/api/arkiva/admin`);
+                const resArkiva = await fetch(API_BASE + `/api/arkiva/admin`);
                 let dataArkiva = await resArkiva.json();
                 
                 let dataShpenzimet = [];
                 if(role === 'admin') {
-                    const resShpenzimet = await fetch(`http://localhost:8000/api/shpenzimet`);
+                    const resShpenzimet = await fetch(API_BASE + `/api/shpenzimet`);
                     dataShpenzimet = await resShpenzimet.json();
                 }
 
@@ -1164,7 +1164,7 @@
             const lista = document.getElementById('listaSmileAdmin');
             lista.innerHTML = '<div class="col-span-full py-10 text-center text-gray-500"><i class="fa-solid fa-spinner fa-spin text-xl mb-2"></i><br>Duke ngarkuar kërkesat...</div>';
             try {
-                const res = await fetch('http://localhost:8000/api/smile');
+                const res = await fetch(API_BASE + '/api/smile');
                 const data = await res.json();
                 if(data.length === 0) {
                     lista.innerHTML = '<div class="col-span-full py-10 text-center text-gray-500 border-2 border-dashed border-gray-300 rounded-xl">Nuk ka asnjë kërkesë Smile Assessment.</div>';
@@ -1174,8 +1174,8 @@
                 data.forEach(s => {
                     let statusColor = s.status === 'E Re' ? 'bg-red-100 text-red-800 border-red-200' : 'bg-green-100 text-green-800 border-green-200';
                     let fotoHtml = s.foto_url 
-                        ? `<div class="relative overflow-hidden rounded-lg mb-3 group cursor-pointer" onclick="hapLightboxAdmin('http://localhost:8000/${s.foto_url}')">
-                             <img src="http://localhost:8000/${s.foto_url}" class="w-full h-48 object-cover transform transition-transform duration-500 group-hover:scale-110">
+                        ? `<div class="relative overflow-hidden rounded-lg mb-3 group cursor-pointer" onclick="hapLightboxAdmin('${API_BASE}/${s.foto_url}')">
+                             <img src="${API_BASE}/${s.foto_url}" class="w-full h-48 object-cover transform transition-transform duration-500 group-hover:scale-110">
                              <div class="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-20 transition duration-300 flex items-center justify-center"><i class="fa-solid fa-magnifying-glass-plus text-white opacity-0 group-hover:opacity-100 text-3xl"></i></div>
                            </div>` 
                         : '<div class="w-full h-32 bg-gray-50 rounded-lg mb-3 flex flex-col items-center justify-center text-gray-400 border border-dashed"><i class="fa-solid fa-image-slash text-2xl mb-1"></i><span class="text-xs">Pa foto</span></div>';
@@ -1218,7 +1218,7 @@
             const mjekuEmri = statusi === 'E Shqyrtuar' ? localStorage.getItem('mjekuName') : null;
             
             try {
-                const res = await fetch(`http://localhost:8000/api/smile/${id}/status`, {
+                const res = await fetch(API_BASE + `/api/smile/${id}/status`, {
                     method: 'PUT', headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ status: statusi, mjeku: mjekuEmri })
                 });
@@ -1227,9 +1227,9 @@
         }
 
         async function fshiSmileAdmin(id) {
-            if(confirm("A jeni të sigurt që dëshironi ta fshini këtë kërkesë? Fotografia e bashkangjitur gjithashtu do të fshihet.")) {
+            if(confirm("A jeni i sigurt që dëshironi ta fshini këtë kërkesë? Fotografia e bashkangjitur gjithashtu do të fshihet.")) {
                 try {
-                    const res = await fetch(`http://localhost:8000/api/smile/${id}`, { method: 'DELETE' });
+                    const res = await fetch(API_BASE + `/api/smile/${id}`, { method: 'DELETE' });
                     if (res.ok) ngarkoSmileAdmin();
                 } catch(e) { alert("Gabim gjatë fshirjes."); }
             }
@@ -1253,7 +1253,7 @@
         async function ngarkoStafin() {
             const lista = document.getElementById('listaStafit');
             try {
-                const res = await fetch('http://localhost:8000/api/stafi');
+                const res = await fetch(API_BASE + '/api/stafi');
                 const data = await res.json();
                 if(data.length === 0) { lista.innerHTML = '<div class="col-span-full text-center text-gray-500">Nuk ka asnjë staf të regjistruar.</div>'; return; }
                 
@@ -1267,7 +1267,7 @@
                     lista.innerHTML += `
                         <div class="bg-white border rounded-xl p-4 flex items-center shadow-sm">
                             <div class="w-16 h-16 rounded-full bg-gray-200 mr-4 overflow-hidden flex-shrink-0">
-                                ${s.foto_url ? `<img src="http://localhost:8000/${s.foto_url}" class="w-full h-full object-cover">` : '<i class="fa-solid fa-user text-2xl mt-4 ml-4 text-gray-400"></i>'}
+                                ${s.foto_url ? `<img src="${API_BASE}/${s.foto_url}" class="w-full h-full object-cover">` : '<i class="fa-solid fa-user text-2xl mt-4 ml-4 text-gray-400"></i>'}
                             </div>
                             <div class="flex-grow">
                                 <h4 class="font-bold text-gray-900">${s.emri}</h4>
@@ -1304,7 +1304,7 @@
             }
 
             try {
-                const res = await fetch('http://localhost:8000/api/stafi', { method: 'POST', body: formData });
+                const res = await fetch(API_BASE + '/api/stafi', { method: 'POST', body: formData });
                 if (!res.ok) {
                     const errorData = await res.json();
                     throw new Error(errorData.detail || "Gabim gjatë ruajtjes.");
@@ -1344,7 +1344,7 @@
             }
 
             try {
-                const res = await fetch(`http://localhost:8000/api/stafi/${id}`, { method: 'PUT', body: formData });
+                const res = await fetch(API_BASE + `/api/stafi/${id}`, { method: 'PUT', body: formData });
                 if (!res.ok) {
                     const errorData = await res.json();
                     throw new Error(errorData.detail || "Gabim gjatë përditësimit.");
@@ -1358,14 +1358,14 @@
         async function ngarkoGaleriaAdmin() {
             const lista = document.getElementById('listaGaleriaAdmin');
             try {
-                const res = await fetch('http://localhost:8000/api/galeria');
+                const res = await fetch(API_BASE + '/api/galeria');
                 const data = await res.json();
                 if(data.length === 0) { lista.innerHTML = '<div class="col-span-full text-center text-gray-500 border-2 border-dashed border-gray-300 rounded-xl py-10">Nuk ka asnjë postim në galeri. Shto të parin!</div>'; return; }
                 
                 lista.innerHTML = '';
                 data.forEach(item => {
-                    const fotoPara = item.foto_para_url.startsWith('http') ? item.foto_para_url : `http://localhost:8000/${item.foto_para_url}`;
-                    const fotoPas = item.foto_pas_url.startsWith('http') ? item.foto_pas_url : `http://localhost:8000/${item.foto_pas_url}`;
+                    const fotoPara = item.foto_para_url.startsWith('http') ? item.foto_para_url : `${API_BASE}/${item.foto_para_url}`;
+                    const fotoPas = item.foto_pas_url.startsWith('http') ? item.foto_pas_url : `${API_BASE}/${item.foto_pas_url}`;
 
                     lista.innerHTML += `
                         <div class="bg-white border rounded-xl overflow-hidden shadow-sm flex flex-col">
@@ -1417,7 +1417,7 @@
             formData.append('foto_pas', fotoPas.files[0]);
 
             try {
-                const res = await fetch('http://localhost:8000/api/galeria', { method: 'POST', body: formData });
+                const res = await fetch(API_BASE + '/api/galeria', { method: 'POST', body: formData });
                 if (!res.ok) throw new Error("Gabim gjatë ruajtjes.");
                 
                 document.getElementById('formaGaleria').reset();
@@ -1428,7 +1428,7 @@
 
         async function fshiGaleriAdmin(id) {
             if(confirm("A jeni i sigurt që dëshironi ta fshini këtë rast nga galeria?")) {
-                await fetch(`http://localhost:8000/api/galeria/${id}`, { method: 'DELETE' });
+                await fetch(API_BASE + `/api/galeria/${id}`, { method: 'DELETE' });
                 ngarkoGaleriaAdmin();
             }
         }
@@ -1436,7 +1436,7 @@
         async function ngarkoVleresimetAdmin() {
             const lista = document.getElementById('listaVleresimeveAdmin');
             try {
-                const res = await fetch('http://localhost:8000/api/vleresimet/admin');
+                const res = await fetch(API_BASE + '/api/vleresimet/admin');
                 const data = await res.json();
                 if(data.length === 0) { lista.innerHTML = '<div class="col-span-full py-10 text-center text-gray-500">Ende nuk ka asnjë vlerësim nga pacientët.</div>'; return; }
                 
@@ -1476,7 +1476,7 @@
 
         async function ndryshoStatusVleresimi(id, statusi_iri) {
             try {
-                const res = await fetch(`http://localhost:8000/api/vleresimet/${id}/status`, {
+                const res = await fetch(API_BASE + `/api/vleresimet/${id}/status`, {
                     method: 'PUT', headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ status: statusi_iri })
                 });
@@ -1487,7 +1487,7 @@
         async function fshiVleresimAdmin(id) {
             if(confirm("A jeni i sigurt që dëshironi ta fshini përgjithmonë këtë vlerësim?")) {
                 try {
-                    const res = await fetch(`http://localhost:8000/api/vleresimet/${id}`, { method: 'DELETE' });
+                    const res = await fetch(API_BASE + `/api/vleresimet/${id}`, { method: 'DELETE' });
                     if (res.ok) ngarkoVleresimetAdmin();
                 } catch(e) { alert("Gabim gjatë fshirjes."); }
             }
@@ -1511,7 +1511,7 @@
         async function ngarkoMjeketPerModal() {
             const dropdown = document.getElementById('shtoPacientMjeku');
             try {
-                const res = await fetch('http://localhost:8000/api/stafi');
+                const res = await fetch(API_BASE + '/api/stafi');
                 const stafi = await res.json();
                 dropdown.innerHTML = '<option value="Çdo Mjek">Cili të jetë i lirë</option>';
                 const emriMjekutKycur = localStorage.getItem('mjekuName');
@@ -1539,7 +1539,7 @@
             };
 
             try {
-                const res = await fetch('http://localhost:8000/api/booking', {
+                const res = await fetch(API_BASE + '/api/booking', {
                     method: 'POST', headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(payload)
                 });
@@ -1572,7 +1572,7 @@
                 }
                 btnRuaj.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Po ruhet...';
                 try {
-                    const res = await fetch(`http://localhost:8000/api/stafi/${passwordAktivId}/password`, {
+                    const res = await fetch(API_BASE + `/api/stafi/${passwordAktivId}/password`, {
                         method: 'PUT', headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify({ password: newPassword })
                     });
@@ -1588,7 +1588,7 @@
 
         async function fshiStaf(id) {
             if(confirm("A jeni i sigurt që dëshironi ta fshini këtë anëtar të stafit?")) {
-                await fetch(`http://localhost:8000/api/stafi/${id}`, { method: 'DELETE' });
+                await fetch(API_BASE + `/api/stafi/${id}`, { method: 'DELETE' });
                 ngarkoStafin();
             }
         }
