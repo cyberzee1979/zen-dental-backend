@@ -685,5 +685,5 @@ def gjenero_raport(muaji_viti: str):
 
 
 if __name__ == "__main__":
-    print("🚀 Serveri po ndizet në http://localhost:8000")
+    print("🚀 Serveri po ndizet në [https://zen-dental-backend.onrender.com](https://zen-dental-backend.onrender.com)")
     uvicorn.run(app, host="0.0.0.0", port=8000)
