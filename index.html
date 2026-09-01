@@ -298,8 +298,9 @@
                                                 <span>Zgjidhni një foto nga pajisja</span>
                                             </span>
                                         </div>
-                                        <p class="text-xs text-gray-500">PNG, JPG deri në 10MB</p>
+                                        <p class="text-xs text-gray-500">Nga telefoni juaj hapet galeria ose kamera</p>
                                     </div>
+                                    <!-- BUTONI I FOTOS ËSHTË KËTU -->
                                     <input id="smileFoto" type="file" accept="image/*" class="sr-only" onchange="shfaqEmrinEFotos(this)">
                                 </div>
                                 
@@ -518,6 +519,12 @@
     </a>
 
     <script>
+        // ==========================================
+        // ADRESA E SERVERIT (KUJDES KUR DEL ONLINE)
+        // ==========================================
+        const API_URL = 'https://zen-dental-backend.onrender.com';
+        // const API_URL = 'https://zen-dental-backend.onrender.com';
+
         let galeriaImazheList = [];
         let indeksiImazhitAktual = 0;
         let menujaE_Hapur = false;
@@ -608,9 +615,7 @@
         }
 
         function mbyllLightboxNgaSfondi(event) {
-            if (event.target.id === 'lightbox') {
-                mbyllLightbox();
-            }
+            if (event.target.id === 'lightbox') mbyllLightbox();
         }
 
         function ndrroImazh(drejtimi, event) {
@@ -634,7 +639,7 @@
             const container = document.getElementById('listaGaleria');
             container.innerHTML = '<div class="col-span-full text-center py-10 text-gray-500"><i class="fa-solid fa-spinner fa-spin text-2xl mb-2"></i><br>Duke ngarkuar...</div>';
             try {
-                const res = await fetch('[https://zen-dental-backend.onrender.com](https://zen-dental-backend.onrender.com)/api/galeria');
+                const res = await fetch(`${API_URL}/api/galeria`);
                 if (!res.ok) throw new Error();
                 const data = await res.json();
                 if (data.length === 0) {
@@ -645,8 +650,8 @@
                 galeriaImazheList = []; 
                 
                 data.forEach(item => {
-                    const fotoPara = item.foto_para_url.startsWith('http') ? item.foto_para_url : `[https://zen-dental-backend.onrender.com](https://zen-dental-backend.onrender.com)/${item.foto_para_url}`;
-                    const fotoPas = item.foto_pas_url.startsWith('http') ? item.foto_pas_url : `[https://zen-dental-backend.onrender.com](https://zen-dental-backend.onrender.com)/${item.foto_pas_url}`;
+                    const fotoPara = item.foto_para_url.startsWith('http') ? item.foto_para_url : `${API_URL}/${item.foto_para_url}`;
+                    const fotoPas = item.foto_pas_url.startsWith('http') ? item.foto_pas_url : `${API_URL}/${item.foto_pas_url}`;
                     
                     const indeksPara = galeriaImazheList.length;
                     galeriaImazheList.push(fotoPara);
@@ -686,7 +691,7 @@
         async function ngarkoMjeket() {
             const dropdown = document.getElementById('mjeku');
             try {
-                const res = await fetch('[https://zen-dental-backend.onrender.com](https://zen-dental-backend.onrender.com)/api/stafi');
+                const res = await fetch(`${API_URL}/api/stafi`);
                 if (!res.ok) throw new Error();
                 const stafi = await res.json();
                 dropdown.innerHTML = '<option value="Çdo Mjek">Cili të jetë i lirë</option>';
@@ -702,7 +707,7 @@
             const container = document.getElementById('listaEkipit');
             container.innerHTML = '<div class="col-span-full text-center py-10 text-gray-500"><i class="fa-solid fa-spinner fa-spin text-2xl mb-2"></i><br>Duke ngarkuar ekipin...</div>';
             try {
-                const res = await fetch('[https://zen-dental-backend.onrender.com](https://zen-dental-backend.onrender.com)/api/stafi');
+                const res = await fetch(`${API_URL}/api/stafi`);
                 if (!res.ok) throw new Error();
                 const stafi = await res.json();
                 if (stafi.length === 0) {
@@ -711,7 +716,7 @@
                 }
                 container.innerHTML = ''; 
                 stafi.forEach(m => {
-                    const fotoUrl = m.foto_url ? `[https://zen-dental-backend.onrender.com](https://zen-dental-backend.onrender.com)/${m.foto_url}` : `https://ui-avatars.com/api/?name=${encodeURIComponent(m.emri)}&background=3B5249&color=fff&size=512`;
+                    const fotoUrl = m.foto_url ? `${API_URL}/${m.foto_url}` : `https://ui-avatars.com/api/?name=${encodeURIComponent(m.emri)}&background=3B5249&color=fff&size=512`;
                     container.innerHTML += `
                         <div class="bg-white rounded-3xl shadow-lg border border-gray-100 overflow-hidden hover:-translate-y-2 transition-transform duration-300 flex flex-col">
                             <img src="${fotoUrl}" alt="${m.emri}" class="w-full aspect-[4/5] object-cover object-top bg-gray-100">
@@ -734,7 +739,7 @@
         async function ngarkoVleresimetFaqe() {
             const container = document.getElementById('listaVleresimeveFaqe');
             try {
-                const res = await fetch('[https://zen-dental-backend.onrender.com](https://zen-dental-backend.onrender.com)/api/vleresimet/aprovuara');
+                const res = await fetch(`${API_URL}/api/vleresimet/aprovuara`);
                 if (!res.ok) throw new Error();
                 const data = await res.json();
                 
@@ -802,7 +807,7 @@
             btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Po dërgohet...';
 
             try {
-                const res = await fetch('[https://zen-dental-backend.onrender.com](https://zen-dental-backend.onrender.com)/api/vleresimet', {
+                const res = await fetch(`${API_URL}/api/vleresimet`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ emri: emri, komenti: komenti, yje: parseInt(yjetInput.value) })
@@ -836,7 +841,7 @@
                 koha_preferuar: document.getElementById('koha_preferuar').value
             };
 
-            fetch('[https://zen-dental-backend.onrender.com](https://zen-dental-backend.onrender.com)/api/booking', {
+            fetch(`${API_URL}/api/booking`, {
                 method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(formData)
             })
             .then(response => {
@@ -867,7 +872,7 @@
             if(fileInput.files.length > 0) formData.append('file', fileInput.files[0]);
 
             try {
-                const response = await fetch('[https://zen-dental-backend.onrender.com](https://zen-dental-backend.onrender.com)/api/smile', { method: 'POST', body: formData });
+                const response = await fetch(`${API_URL}/api/smile`, { method: 'POST', body: formData });
                 if (response.ok) {
                     document.getElementById('smileForm').classList.add('hidden');
                     document.getElementById('smileSuksesi').classList.remove('hidden');

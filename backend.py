@@ -13,7 +13,7 @@ app = FastAPI()
 
 # === KONFIGURIMI I LLOGARISË SË ADMINISTRATORIT ===
 ADMIN_USERNAME = "admin"
-ADMIN_PASSWORD = "Ferizaj2026$" # <--- NDRYSHO KËTË PARA SE TA PUBLIKOSH ONLINE
+ADMIN_PASSWORD = "Ferizaj2026$" 
 # ==================================================
 
 app.add_middleware(
@@ -35,6 +35,7 @@ class BookingForm(BaseModel):
     sherbimi: str
     data_preferuar: str
     koha_preferuar: str
+    numri_personal: str = ""
 
 class LoginData(BaseModel):
     username: str
@@ -43,10 +44,12 @@ class LoginData(BaseModel):
 class PerfundimForm(BaseModel):
     shenime: str
     cmimi: float = 0.0
+    numri_personal: str = ""
 
 class NdryshoShenimeForm(BaseModel):
     shenime: str
     cmimi: float = 0.0
+    numri_personal: str = ""
 
 class PasswordForm(BaseModel):
     password: str
@@ -63,470 +66,402 @@ class StatusSmileForm(BaseModel):
     status: str
     mjeku: Optional[str] = None
 
-# Modeli i ri për Shpenzimet
 class ShpenzimForm(BaseModel):
     materiali: str
     kompania: str
     cmimi: float
     data: str
 
+class KontrataKesteForm(BaseModel):
+    emri: str
+    telefoni: str
+    numri_personal: str
+    mjeku: str
+    sherbimi: str
+    shuma_totale: float
+    data_fillimit: str
+
+class KestForm(BaseModel):
+    shuma: float
+    data: str
+
 def init_db():
     conn = sqlite3.connect("databaza_klinikes.db")
     cursor = conn.cursor()
     
-    cursor.execute("""
-        CREATE TABLE IF NOT EXISTS rezervimet (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            emri TEXT,
-            telefoni TEXT,
-            mjeku TEXT,
-            sherbimi TEXT,
-            data TEXT,
-            ora TEXT,
-            status TEXT DEFAULT 'Aktiv',
-            shenime TEXT,
-            cmimi REAL DEFAULT 0
-        )
-    """)
+    cursor.execute("""CREATE TABLE IF NOT EXISTS rezervimet (id INTEGER PRIMARY KEY AUTOINCREMENT, emri TEXT, telefoni TEXT, mjeku TEXT, sherbimi TEXT, data TEXT, ora TEXT, status TEXT DEFAULT 'Aktiv', shenime TEXT, cmimi REAL DEFAULT 0, numri_personal TEXT DEFAULT '')""")
+    cursor.execute("""CREATE TABLE IF NOT EXISTS stafi (id INTEGER PRIMARY KEY AUTOINCREMENT, emri TEXT, roli TEXT, pershkrimi TEXT, foto_url TEXT, username TEXT UNIQUE, password TEXT)""")
+    cursor.execute("""CREATE TABLE IF NOT EXISTS galeria (id INTEGER PRIMARY KEY AUTOINCREMENT, titulli TEXT, pershkrimi TEXT, foto_para_url TEXT, foto_pas_url TEXT, data_krijimit TIMESTAMP DEFAULT CURRENT_TIMESTAMP)""")
+    cursor.execute("""CREATE TABLE IF NOT EXISTS vleresimet (id INTEGER PRIMARY KEY AUTOINCREMENT, emri TEXT, komenti TEXT, yje INTEGER, status TEXT DEFAULT 'Ne Pritje', data TIMESTAMP DEFAULT CURRENT_TIMESTAMP)""")
+    cursor.execute("""CREATE TABLE IF NOT EXISTS smile_assessments (id INTEGER PRIMARY KEY AUTOINCREMENT, emri TEXT, kontakti TEXT, problemi TEXT, foto_url TEXT, status TEXT DEFAULT 'E Re', shqyrtuar_nga TEXT, data TIMESTAMP DEFAULT CURRENT_TIMESTAMP)""")
+    cursor.execute("""CREATE TABLE IF NOT EXISTS shpenzimet (id INTEGER PRIMARY KEY AUTOINCREMENT, materiali TEXT, kompania TEXT, cmimi REAL, data TEXT, data_regjistrimit TIMESTAMP DEFAULT CURRENT_TIMESTAMP)""")
+    cursor.execute("""CREATE TABLE IF NOT EXISTS kontratat_keste (id INTEGER PRIMARY KEY AUTOINCREMENT, emri TEXT, telefoni TEXT, numri_personal TEXT, mjeku TEXT, sherbimi TEXT, shuma_totale REAL, data_fillimit TEXT, statusi TEXT DEFAULT 'Aktiv')""")
+    cursor.execute("""CREATE TABLE IF NOT EXISTS kestet (id INTEGER PRIMARY KEY AUTOINCREMENT, kontrata_id INTEGER, shuma REAL, data TEXT, data_regjistrimit TIMESTAMP DEFAULT CURRENT_TIMESTAMP, FOREIGN KEY (kontrata_id) REFERENCES kontratat_keste(id))""")
     
-    cursor.execute("""
-        CREATE TABLE IF NOT EXISTS stafi (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            emri TEXT,
-            roli TEXT,
-            pershkrimi TEXT,
-            foto_url TEXT,
-            username TEXT UNIQUE,
-            password TEXT
-        )
-    """)
-    
-    cursor.execute("""
-        CREATE TABLE IF NOT EXISTS galeria (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            titulli TEXT,
-            pershkrimi TEXT,
-            foto_para_url TEXT,
-            foto_pas_url TEXT,
-            data_krijimit TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-        )
-    """)
-
-    cursor.execute("""
-        CREATE TABLE IF NOT EXISTS vleresimet (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            emri TEXT,
-            komenti TEXT,
-            yje INTEGER,
-            status TEXT DEFAULT 'Ne Pritje',
-            data TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-        )
-    """)
-    
-    cursor.execute("""
-        CREATE TABLE IF NOT EXISTS smile_assessments (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            emri TEXT,
-            kontakti TEXT,
-            problemi TEXT,
-            foto_url TEXT,
-            status TEXT DEFAULT 'E Re',
-            data TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-        )
-    """)
-    
-    # --- TABELA E RE PËR SHPENZIMET E MATERIALEVE ---
-    cursor.execute("""
-        CREATE TABLE IF NOT EXISTS shpenzimet (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            materiali TEXT,
-            kompania TEXT,
-            cmimi REAL,
-            data TEXT,
-            data_regjistrimit TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-        )
-    """)
-    
-    try:
-        cursor.execute("ALTER TABLE rezervimet ADD COLUMN status TEXT DEFAULT 'Aktiv'")
-    except sqlite3.OperationalError: pass
-    try:
-        cursor.execute("ALTER TABLE rezervimet ADD COLUMN shenime TEXT")
-    except sqlite3.OperationalError: pass
-    try:
-        cursor.execute("ALTER TABLE rezervimet ADD COLUMN cmimi REAL DEFAULT 0")
-    except sqlite3.OperationalError: pass
-    try:
-        cursor.execute("ALTER TABLE stafi ADD COLUMN username TEXT")
-        cursor.execute("ALTER TABLE stafi ADD COLUMN password TEXT")
-    except sqlite3.OperationalError: pass
-    try:
-        cursor.execute("ALTER TABLE smile_assessments ADD COLUMN shqyrtuar_nga TEXT")
-    except sqlite3.OperationalError: pass
+    # Migrimet
+    try: cursor.execute("ALTER TABLE rezervimet ADD COLUMN status TEXT DEFAULT 'Aktiv'")
+    except: pass
+    try: cursor.execute("ALTER TABLE rezervimet ADD COLUMN shenime TEXT")
+    except: pass
+    try: cursor.execute("ALTER TABLE rezervimet ADD COLUMN cmimi REAL DEFAULT 0")
+    except: pass
+    try: cursor.execute("ALTER TABLE rezervimet ADD COLUMN numri_personal TEXT DEFAULT ''")
+    except: pass
+    try: cursor.execute("ALTER TABLE stafi ADD COLUMN username TEXT")
+    except: pass
+    try: cursor.execute("ALTER TABLE stafi ADD COLUMN password TEXT")
+    except: pass
+    try: cursor.execute("ALTER TABLE smile_assessments ADD COLUMN shqyrtuar_nga TEXT")
+    except: pass
+    try: cursor.execute("ALTER TABLE kestet ADD COLUMN kontrata_id INTEGER")
+    except: pass
         
     cursor.execute("SELECT COUNT(*) FROM stafi")
     if cursor.fetchone()[0] == 0:
-        cursor.execute("INSERT INTO stafi (emri, roli, pershkrimi, foto_url, username, password) VALUES (?, ?, ?, ?, ?, ?)",
-            ("Dr. Agon Gashi", "Kirurg Oral & Implantolog", "Ekspert në kirurgji.", "", "agon", "123"))
-        cursor.execute("INSERT INTO stafi (emri, roli, pershkrimi, foto_url, username, password) VALUES (?, ?, ?, ?, ?, ?)",
-            ("Dr. Blerta Kelmendi", "Ortodonte & Estetikë", "Eksperte në estetikë.", "", "blerta", "123"))
-            
-    cursor.execute("SELECT COUNT(*) FROM galeria")
-    if cursor.fetchone()[0] == 0:
-        cursor.execute("INSERT INTO galeria (titulli, pershkrimi, foto_para_url, foto_pas_url) VALUES (?, ?, ?, ?)",
-            ("Faseta E-max (Veneers)", "Ndryshim total i formës dhe ngjyrës me 10 faseta në nofullën e sipërme.", "https://images.unsplash.com/photo-1606811841689-23dfddce3e95?w=500&q=80", "https://images.unsplash.com/photo-1590664095641-7fa05f689813?w=500&q=80"))
-
-    cursor.execute("SELECT COUNT(*) FROM vleresimet")
-    if cursor.fetchone()[0] == 0:
-        cursor.execute("INSERT INTO vleresimet (emri, komenti, yje, status) VALUES (?, ?, ?, ?)",
-            ("Arbër Hoxha", "Shërbim i shkëlqyer dhe ambient shumë relaksues! Doktorët janë shumë profesionistë dhe më hoqën frikën nga dentisti.", 5, "E Aprovuar"))
-            
+        cursor.execute("INSERT INTO stafi (emri, roli, pershkrimi, foto_url, username, password) VALUES (?, ?, ?, ?, ?, ?)", ("Dr. Agon Gashi", "Kirurg Oral & Implantolog", "Ekspert në kirurgji.", "", "agon", "123"))
     conn.commit()
     conn.close()
 
 init_db()
 
-# ==========================================
-# ENDPOINTET EKZISTUESE (TË PANDRYSHUARA)
-# ==========================================
-
 @app.post("/api/login")
 def kycja(data: LoginData):
     username_i_paster = data.username.strip().lower()
-    
     if username_i_paster == ADMIN_USERNAME.lower() and data.password == ADMIN_PASSWORD:
         return {"status": "success", "role": "admin", "name": "Administrator"}
-        
     try:
         conn = sqlite3.connect("databaza_klinikes.db")
         cursor = conn.cursor()
         cursor.execute("SELECT emri, password FROM stafi WHERE LOWER(username) = ?", (username_i_paster,))
         user = cursor.fetchone()
         conn.close()
-        
         if user and user[1] == data.password:
             return {"status": "success", "role": user[0], "name": user[0]}
-            
         raise HTTPException(status_code=401, detail="Kredenciale të gabuara")
-    except Exception as e:
-         raise HTTPException(status_code=500, detail="Gabim në databazë")
+    except Exception as e: raise HTTPException(status_code=500, detail="Gabim në databazë")
 
 @app.post("/api/booking")
 def shto_rezervim(form: BookingForm):
     try:
         conn = sqlite3.connect("databaza_klinikes.db")
         cursor = conn.cursor()
-        cursor.execute(
-            "INSERT INTO rezervimet (emri, telefoni, mjeku, sherbimi, data, ora) VALUES (?, ?, ?, ?, ?, ?)",
-            (form.emri, form.telefoni, form.mjeku, form.sherbimi, form.data_preferuar, form.koha_preferuar)
-        )
+        cursor.execute("INSERT INTO rezervimet (emri, telefoni, mjeku, sherbimi, data, ora, numri_personal) VALUES (?, ?, ?, ?, ?, ?, ?)", 
+                       (form.emri, form.telefoni, form.mjeku, form.sherbimi, form.data_preferuar, form.koha_preferuar, form.numri_personal))
         conn.commit()
         conn.close()
-        return {"status": "success", "message": "Rezervimi u ruajt me sukses!"}
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+        return {"status": "success"}
+    except Exception as e: raise HTTPException(status_code=500, detail=str(e))
 
 @app.get("/api/rezervimet/{mjeku_emri}")
 def merr_rezervimet(mjeku_emri: str):
     try:
         conn = sqlite3.connect("databaza_klinikes.db")
         cursor = conn.cursor()
-        
         if mjeku_emri == "admin" or mjeku_emri == "Çdo Mjek":
-            cursor.execute("SELECT id, emri, telefoni, mjeku, sherbimi, data, ora FROM rezervimet WHERE status = 'Aktiv' ORDER BY data ASC, ora ASC")
+            cursor.execute("SELECT id, emri, telefoni, mjeku, sherbimi, data, ora, numri_personal FROM rezervimet WHERE status = 'Aktiv' ORDER BY data ASC, ora ASC")
         else:
-            cursor.execute("SELECT id, emri, telefoni, mjeku, sherbimi, data, ora FROM rezervimet WHERE (mjeku = ? OR mjeku = 'Çdo Mjek') AND status = 'Aktiv' ORDER BY data ASC, ora ASC", (mjeku_emri,))
-            
+            cursor.execute("SELECT id, emri, telefoni, mjeku, sherbimi, data, ora, numri_personal FROM rezervimet WHERE (mjeku = ? OR mjeku = 'Çdo Mjek') AND status = 'Aktiv' ORDER BY data ASC, ora ASC", (mjeku_emri,))
         rreshtat = cursor.fetchall()
-        rezultati = [{"id": r[0], "emri": r[1], "telefoni": r[2], "mjeku": r[3], "sherbimi": r[4], "data": r[5], "ora": r[6]} for r in rreshtat]
+        rezultati = [{"id": r[0], "emri": r[1], "telefoni": r[2], "mjeku": r[3], "sherbimi": r[4], "data": r[5], "ora": r[6], "numri_personal": r[7]} for r in rreshtat]
         conn.close()
         return rezultati
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+    except Exception as e: raise HTTPException(status_code=500, detail=str(e))
 
 @app.post("/api/rezervimet/{id}/perfunduar")
 def perfundo_termin(id: int, form: PerfundimForm):
     try:
         conn = sqlite3.connect("databaza_klinikes.db")
         cursor = conn.cursor()
-        cursor.execute(
-            "UPDATE rezervimet SET status = 'Perfunduar', shenime = ?, cmimi = ? WHERE id = ?", 
-            (form.shenime, form.cmimi, id)
-        )
+        cursor.execute("UPDATE rezervimet SET status = 'Perfunduar', shenime = ?, cmimi = ?, numri_personal = ? WHERE id = ?", (form.shenime, form.cmimi, form.numri_personal, id))
         conn.commit()
         conn.close()
         return {"status": "success"}
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+    except Exception as e: raise HTTPException(status_code=500, detail=str(e))
 
 @app.post("/api/rezervimet/{id}/ndrysho")
 def ndrysho_arkiven(id: int, form: NdryshoShenimeForm):
     try:
         conn = sqlite3.connect("databaza_klinikes.db")
         cursor = conn.cursor()
-        cursor.execute("UPDATE rezervimet SET shenime = ?, cmimi = ? WHERE id = ?", (form.shenime, form.cmimi, id))
+        cursor.execute("UPDATE rezervimet SET shenime = ?, cmimi = ?, numri_personal = ? WHERE id = ?", (form.shenime, form.cmimi, form.numri_personal, id))
         conn.commit()
         conn.close()
         return {"status": "success"}
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+    except Exception as e: raise HTTPException(status_code=500, detail=str(e))
 
 @app.get("/api/arkiva/admin")
 def merr_arkiven():
     try:
         conn = sqlite3.connect("databaza_klinikes.db")
         cursor = conn.cursor()
-        cursor.execute("SELECT id, emri, telefoni, mjeku, sherbimi, data, ora, shenime, cmimi FROM rezervimet WHERE status = 'Perfunduar' ORDER BY data DESC, ora DESC")
+        cursor.execute("""
+            SELECT MAX(id) as last_id, MAX(emri) as emri, telefoni, MAX(mjeku) as mjeku, MAX(sherbimi) as sherbimi, MAX(data) as data_fundit, MAX(ora) as ora, MAX(shenime) as shenime, SUM(cmimi) as totali_paguar, COUNT(id) as numri_vizitave, MAX(numri_personal) as numri_personal
+            FROM rezervimet WHERE status = 'Perfunduar' 
+            GROUP BY CASE WHEN numri_personal IS NOT NULL AND TRIM(numri_personal) != '' THEN numri_personal ELSE telefoni END
+            ORDER BY data_fundit DESC, ora DESC
+        """)
         rreshtat = cursor.fetchall()
-        rezultati = [{"id": r[0], "emri": r[1], "telefoni": r[2], "mjeku": r[3], "sherbimi": r[4], "data": r[5], "ora": r[6], "shenime": r[7], "cmimi": r[8]} for r in rreshtat]
+        rezultati = [{"id": r[0], "emri": r[1], "telefoni": r[2], "mjeku": r[3], "sherbimi": r[4], "data_fundit": r[5], "ora": r[6], "shenime": r[7], "totali_paguar": r[8], "vizita": r[9], "numri_personal": r[10]} for r in rreshtat]
         conn.close()
         return rezultati
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+    except Exception as e: raise HTTPException(status_code=500, detail=str(e))
 
-@app.get("/api/historia/{telefoni}")
-def merr_historine(telefoni: str):
+@app.get("/api/historia/{identifikuesi}")
+def merr_historine(identifikuesi: str):
     try:
         conn = sqlite3.connect("databaza_klinikes.db")
         cursor = conn.cursor()
-        cursor.execute("SELECT mjeku, sherbimi, data, shenime, cmimi FROM rezervimet WHERE telefoni = ? AND status = 'Perfunduar' ORDER BY data DESC", (telefoni,))
+        cursor.execute("SELECT id, mjeku, sherbimi, data, shenime, cmimi, numri_personal FROM rezervimet WHERE (numri_personal = ? OR telefoni = ?) AND status = 'Perfunduar' ORDER BY data DESC", (identifikuesi, identifikuesi))
         rreshtat = cursor.fetchall()
-        rezultati = [{"mjeku": r[0], "sherbimi": r[1], "data": r[2], "shenime": r[3], "cmimi": r[4]} for r in rreshtat]
+        rezultati = [{"id": r[0], "mjeku": r[1], "sherbimi": r[2], "data": r[3], "shenime": r[4], "cmimi": r[5], "numri_personal": r[6]} for r in rreshtat]
         conn.close()
         return rezultati
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+    except Exception as e: raise HTTPException(status_code=500, detail=str(e))
+
+@app.post("/api/kontratat_keste")
+def shto_kontrate_keste(form: KontrataKesteForm):
+    try:
+        conn = sqlite3.connect("databaza_klinikes.db")
+        cursor = conn.cursor()
+        cursor.execute("INSERT INTO kontratat_keste (emri, telefoni, numri_personal, mjeku, sherbimi, shuma_totale, data_fillimit) VALUES (?, ?, ?, ?, ?, ?, ?)", (form.emri, form.telefoni, form.numri_personal, form.mjeku, form.sherbimi, form.shuma_totale, form.data_fillimit))
+        conn.commit()
+        conn.close()
+        return {"status": "success"}
+    except Exception as e: raise HTTPException(status_code=500, detail=str(e))
+
+@app.get("/api/kontratat_keste")
+def merr_kontratat_keste():
+    try:
+        conn = sqlite3.connect("databaza_klinikes.db")
+        cursor = conn.cursor()
+        cursor.execute("SELECT k.id, k.emri, k.telefoni, k.numri_personal, k.mjeku, k.sherbimi, k.shuma_totale, k.data_fillimit, COALESCE((SELECT SUM(shuma) FROM kestet WHERE kontrata_id = k.id), 0) as shuma_paguar FROM kontratat_keste k ORDER BY k.data_fillimit DESC")
+        rezultati = [{"id": r[0], "emri": r[1], "telefoni": r[2], "numri_personal": r[3], "mjeku": r[4], "sherbimi": r[5], "shuma_totale": r[6], "data_fillimit": r[7], "shuma_paguar": r[8], "shuma_mbetur": r[6]-r[8]} for r in cursor.fetchall()]
+        conn.close()
+        return rezultati
+    except Exception as e: raise HTTPException(status_code=500, detail=str(e))
+
+@app.post("/api/kontratat_keste/{kontrata_id}/kestet")
+def shto_kest(kontrata_id: int, form: KestForm):
+    try:
+        conn = sqlite3.connect("databaza_klinikes.db")
+        cursor = conn.cursor()
+        cursor.execute("INSERT INTO kestet (kontrata_id, shuma, data) VALUES (?, ?, ?)", (kontrata_id, form.shuma, form.data))
+        conn.commit()
+        conn.close()
+        return {"status": "success"}
+    except Exception as e: raise HTTPException(status_code=500, detail=str(e))
+
+@app.get("/api/kontratat_keste/{kontrata_id}/kestet")
+def merr_kestet(kontrata_id: int):
+    try:
+        conn = sqlite3.connect("databaza_klinikes.db")
+        cursor = conn.cursor()
+        cursor.execute("SELECT id, shuma, data FROM kestet WHERE kontrata_id = ? ORDER BY data DESC, id DESC", (kontrata_id,))
+        kestet = [{"id": r[0], "shuma": r[1], "data": r[2]} for r in cursor.fetchall()]
+        conn.close()
+        return kestet
+    except Exception as e: raise HTTPException(status_code=500, detail=str(e))
+
+@app.delete("/api/kestet/{id}")
+def fshi_kest(id: int):
+    try:
+        conn = sqlite3.connect("databaza_klinikes.db")
+        cursor = conn.cursor()
+        cursor.execute("DELETE FROM kestet WHERE id = ?", (id,))
+        conn.commit()
+        conn.close()
+        return {"status": "success"}
+    except Exception as e: raise HTTPException(status_code=500, detail=str(e))
+
+@app.post("/api/shpenzimet")
+def shto_shpenzim(form: ShpenzimForm):
+    conn = sqlite3.connect("databaza_klinikes.db")
+    cursor = conn.cursor()
+    cursor.execute("INSERT INTO shpenzimet (materiali, kompania, cmimi, data) VALUES (?, ?, ?, ?)", (form.materiali, form.kompania, form.cmimi, form.data))
+    conn.commit()
+    conn.close()
+    return {"status": "success"}
+
+@app.get("/api/shpenzimet")
+def merr_shpenzimet():
+    conn = sqlite3.connect("databaza_klinikes.db")
+    cursor = conn.cursor()
+    cursor.execute("SELECT id, materiali, kompania, cmimi, data FROM shpenzimet ORDER BY data DESC")
+    rez = [{"id": r[0], "materiali": r[1], "kompania": r[2], "cmimi": r[3], "data": r[4]} for r in cursor.fetchall()]
+    conn.close()
+    return rez
+
+@app.delete("/api/shpenzimet/{id}")
+def fshi_shpenzim(id: int):
+    conn = sqlite3.connect("databaza_klinikes.db")
+    cursor = conn.cursor()
+    cursor.execute("DELETE FROM shpenzimet WHERE id = ?", (id,))
+    conn.commit()
+    conn.close()
+    return {"status": "success"}
+
+@app.get("/api/raporti/{viti_muaji}")
+def gjenero_raport(viti_muaji: str):
+    try:
+        conn = sqlite3.connect("databaza_klinikes.db")
+        cursor = conn.cursor()
+        kerkim_data = viti_muaji + "%"
+
+        cursor.execute("SELECT SUM(cmimi) FROM rezervimet WHERE status = 'Perfunduar' AND data LIKE ?", (kerkim_data,))
+        te_hyrat_vizitat = cursor.fetchone()[0] or 0.0
+
+        cursor.execute("SELECT data, emri, mjeku, cmimi, numri_personal FROM rezervimet WHERE status = 'Perfunduar' AND data LIKE ? ORDER BY data DESC", (kerkim_data,))
+        vizitat_lista = [{"data": r[0], "emri": r[1], "mjeku": r[2], "cmimi": r[3], "numri_personal": r[4]} for r in cursor.fetchall()]
+        
+        cursor.execute("SELECT SUM(cmimi) FROM shpenzimet WHERE data LIKE ?", (kerkim_data,))
+        shpenzimet = cursor.fetchone()[0] or 0.0
+
+        cursor.execute("SELECT SUM(shuma) FROM kestet WHERE data LIKE ?", (kerkim_data,))
+        te_hyrat_kestet = cursor.fetchone()[0] or 0.0
+        
+        cursor.execute("SELECT k.data, kon.emri, k.shuma, kon.numri_personal, kon.mjeku FROM kestet k JOIN kontratat_keste kon ON k.kontrata_id = kon.id WHERE k.data LIKE ? ORDER BY k.data DESC", (kerkim_data,))
+        kestet_lista = [{"data": r[0], "emri": r[1], "shuma": r[2], "numri_personal": r[3], "mjeku": r[4]} for r in cursor.fetchall()]
+
+        conn.close()
+        return {
+            "te_hyrat_pacientet": te_hyrat_vizitat,
+            "vizitat_lista": vizitat_lista,
+            "shpenzimet_materiale": shpenzimet,
+            "te_hyrat_kestet": te_hyrat_kestet,
+            "kestet_lista": kestet_lista,
+            "fitimi_neto": te_hyrat_vizitat - shpenzimet
+        }
+    except Exception as e: raise HTTPException(status_code=500, detail=str(e))
 
 @app.get("/api/stafi")
 def merr_stafin():
-    try:
-        conn = sqlite3.connect("databaza_klinikes.db")
-        cursor = conn.cursor()
-        cursor.execute("SELECT id, emri, roli, pershkrimi, foto_url, username FROM stafi")
-        rreshtat = cursor.fetchall()
-        rezultati = [{"id": r[0], "emri": r[1], "roli": r[2], "pershkrimi": r[3], "foto_url": r[4], "username": r[5]} for r in rreshtat]
-        conn.close()
-        return rezultati
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+    conn = sqlite3.connect("databaza_klinikes.db")
+    cursor = conn.cursor()
+    cursor.execute("SELECT id, emri, roli, pershkrimi, foto_url, username FROM stafi")
+    rez = [{"id": r[0], "emri": r[1], "roli": r[2], "pershkrimi": r[3], "foto_url": r[4], "username": r[5]} for r in cursor.fetchall()]
+    conn.close()
+    return rez
 
 @app.post("/api/stafi")
 async def shto_staf(emri: str = Form(...), roli: str = Form(...), pershkrimi: str = Form(...), username: str = Form(...), password: str = Form(...), file: Optional[UploadFile] = File(None)):
     foto_url = ""
+    if file:
+        file_path = f"uploads/staf_{datetime.now().strftime('%Y%m%d%H%M%S')}_{file.filename}"
+        with open(file_path, "wb") as buffer: shutil.copyfileobj(file.file, buffer)
+        foto_url = file_path 
+    conn = sqlite3.connect("databaza_klinikes.db")
+    cursor = conn.cursor()
     try:
-        if file:
-            filename = f"staf_{datetime.now().strftime('%Y%m%d%H%M%S')}_{file.filename}"
-            file_path = f"uploads/{filename}"
-            with open(file_path, "wb") as buffer:
-                shutil.copyfileobj(file.file, buffer)
-            foto_url = file_path 
-            
-        conn = sqlite3.connect("databaza_klinikes.db")
-        cursor = conn.cursor()
-        cursor.execute(
-            "INSERT INTO stafi (emri, roli, pershkrimi, foto_url, username, password) VALUES (?, ?, ?, ?, ?, ?)", 
-            (emri, roli, pershkrimi, foto_url, username, password)
-        )
+        cursor.execute("INSERT INTO stafi (emri, roli, pershkrimi, foto_url, username, password) VALUES (?, ?, ?, ?, ?, ?)", (emri, roli, pershkrimi, foto_url, username, password))
         conn.commit()
-        conn.close()
-        return {"status": "success"}
-    except sqlite3.IntegrityError:
-        raise HTTPException(status_code=400, detail="Ky username ekziston tashmë! Zgjidhni një tjetër.")
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+    except sqlite3.IntegrityError: raise HTTPException(status_code=400, detail="Ky username ekziston tashmë!")
+    finally: conn.close()
+    return {"status": "success"}
 
 @app.put("/api/stafi/{id_stafit}")
-async def ndrysho_te_dhenat_stafit(
-    id_stafit: int,
-    emri: str = Form(...),
-    roli: str = Form(...),
-    pershkrimi: str = Form(...),
-    username: str = Form(...),
-    file: Optional[UploadFile] = File(None)
-):
-    try:
-        conn = sqlite3.connect("databaza_klinikes.db")
-        cursor = conn.cursor()
-
-        if file:
-            filename = f"staf_{datetime.now().strftime('%Y%m%d%H%M%S')}_{file.filename}"
-            file_path = f"uploads/{filename}"
-            with open(file_path, "wb") as buffer:
-                shutil.copyfileobj(file.file, buffer)
-            
-            cursor.execute("SELECT foto_url FROM stafi WHERE id = ?", (id_stafit,))
-            foto_vjeter = cursor.fetchone()
-            if foto_vjeter and foto_vjeter[0] and os.path.exists(foto_vjeter[0]):
-                os.remove(foto_vjeter[0])
-
-            cursor.execute(
-                "UPDATE stafi SET emri = ?, roli = ?, pershkrimi = ?, username = ?, foto_url = ? WHERE id = ?",
-                (emri, roli, pershkrimi, username, file_path, id_stafit)
-            )
-        else:
-            cursor.execute(
-                "UPDATE stafi SET emri = ?, roli = ?, pershkrimi = ?, username = ? WHERE id = ?",
-                (emri, roli, pershkrimi, username, id_stafit)
-            )
-        
-        conn.commit()
-        conn.close()
-        return {"status": "success"}
-    except sqlite3.IntegrityError:
-        raise HTTPException(status_code=400, detail="Ky username ekziston tashmë! Zgjidhni një tjetër.")
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+async def ndrysho_te_dhenat_stafit(id_stafit: int, emri: str = Form(...), roli: str = Form(...), pershkrimi: str = Form(...), username: str = Form(...), file: Optional[UploadFile] = File(None)):
+    conn = sqlite3.connect("databaza_klinikes.db")
+    cursor = conn.cursor()
+    if file:
+        file_path = f"uploads/staf_{datetime.now().strftime('%Y%m%d%H%M%S')}_{file.filename}"
+        with open(file_path, "wb") as buffer: shutil.copyfileobj(file.file, buffer)
+        cursor.execute("UPDATE stafi SET emri = ?, roli = ?, pershkrimi = ?, username = ?, foto_url = ? WHERE id = ?", (emri, roli, pershkrimi, username, file_path, id_stafit))
+    else:
+        cursor.execute("UPDATE stafi SET emri = ?, roli = ?, pershkrimi = ?, username = ? WHERE id = ?", (emri, roli, pershkrimi, username, id_stafit))
+    conn.commit()
+    conn.close()
+    return {"status": "success"}
 
 @app.put("/api/stafi/{id_stafit}/password")
 def ndrysho_password(id_stafit: int, form: PasswordForm):
-    try:
-        conn = sqlite3.connect("databaza_klinikes.db")
-        cursor = conn.cursor()
-        cursor.execute("UPDATE stafi SET password = ? WHERE id = ?", (form.password, id_stafit))
-        conn.commit()
-        conn.close()
-        return {"status": "success"}
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+    conn = sqlite3.connect("databaza_klinikes.db")
+    cursor = conn.cursor()
+    cursor.execute("UPDATE stafi SET password = ? WHERE id = ?", (form.password, id_stafit))
+    conn.commit()
+    conn.close()
+    return {"status": "success"}
 
 @app.delete("/api/stafi/{id_stafit}")
 def fshi_staf(id_stafit: int):
-    try:
-        conn = sqlite3.connect("databaza_klinikes.db")
-        cursor = conn.cursor()
-        cursor.execute("SELECT foto_url FROM stafi WHERE id = ?", (id_stafit,))
-        foto = cursor.fetchone()
-        
-        if foto and foto[0] and os.path.exists(foto[0]):
-            os.remove(foto[0])
-            
-        cursor.execute("DELETE FROM stafi WHERE id = ?", (id_stafit,))
-        conn.commit()
-        conn.close()
-        return {"status": "success"}
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+    conn = sqlite3.connect("databaza_klinikes.db")
+    cursor = conn.cursor()
+    cursor.execute("DELETE FROM stafi WHERE id = ?", (id_stafit,))
+    conn.commit()
+    conn.close()
+    return {"status": "success"}
 
 @app.get("/api/galeria")
 def merr_galerine():
-    try:
-        conn = sqlite3.connect("databaza_klinikes.db")
-        cursor = conn.cursor()
-        cursor.execute("SELECT id, titulli, pershkrimi, foto_para_url, foto_pas_url FROM galeria ORDER BY data_krijimit DESC")
-        rreshtat = cursor.fetchall()
-        rezultati = [{"id": r[0], "titulli": r[1], "pershkrimi": r[2], "foto_para_url": r[3], "foto_pas_url": r[4]} for r in rreshtat]
-        conn.close()
-        return rezultati
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+    conn = sqlite3.connect("databaza_klinikes.db")
+    cursor = conn.cursor()
+    cursor.execute("SELECT id, titulli, pershkrimi, foto_para_url, foto_pas_url FROM galeria ORDER BY data_krijimit DESC")
+    rez = [{"id": r[0], "titulli": r[1], "pershkrimi": r[2], "foto_para_url": r[3], "foto_pas_url": r[4]} for r in cursor.fetchall()]
+    conn.close()
+    return rez
 
 @app.post("/api/galeria")
-async def shto_galeri(
-    titulli: str = Form(...), 
-    pershkrimi: str = Form(...), 
-    foto_para: UploadFile = File(...), 
-    foto_pas: UploadFile = File(...)
-):
-    try:
-        filename_para = f"galeri_para_{datetime.now().strftime('%Y%m%d%H%M%S')}_{foto_para.filename}"
-        path_para = f"uploads/{filename_para}"
-        with open(path_para, "wb") as buffer:
-            shutil.copyfileobj(foto_para.file, buffer)
-            
-        filename_pas = f"galeri_pas_{datetime.now().strftime('%Y%m%d%H%M%S')}_{foto_pas.filename}"
-        path_pas = f"uploads/{filename_pas}"
-        with open(path_pas, "wb") as buffer:
-            shutil.copyfileobj(foto_pas.file, buffer)
-            
-        conn = sqlite3.connect("databaza_klinikes.db")
-        cursor = conn.cursor()
-        cursor.execute(
-            "INSERT INTO galeria (titulli, pershkrimi, foto_para_url, foto_pas_url) VALUES (?, ?, ?, ?)", 
-            (titulli, pershkrimi, path_para, path_pas)
-        )
-        conn.commit()
-        conn.close()
-        return {"status": "success"}
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+async def shto_galeri(titulli: str = Form(...), pershkrimi: str = Form(...), foto_para: UploadFile = File(...), foto_pas: UploadFile = File(...)):
+    path_para = f"uploads/galeri_para_{datetime.now().strftime('%Y%m%d%H%M%S')}_{foto_para.filename}"
+    with open(path_para, "wb") as buffer: shutil.copyfileobj(foto_para.file, buffer)
+    path_pas = f"uploads/galeri_pas_{datetime.now().strftime('%Y%m%d%H%M%S')}_{foto_pas.filename}"
+    with open(path_pas, "wb") as buffer: shutil.copyfileobj(foto_pas.file, buffer)
+    conn = sqlite3.connect("databaza_klinikes.db")
+    cursor = conn.cursor()
+    cursor.execute("INSERT INTO galeria (titulli, pershkrimi, foto_para_url, foto_pas_url) VALUES (?, ?, ?, ?)", (titulli, pershkrimi, path_para, path_pas))
+    conn.commit()
+    conn.close()
+    return {"status": "success"}
 
 @app.delete("/api/galeria/{id}")
 def fshi_galeri(id: int):
-    try:
-        conn = sqlite3.connect("databaza_klinikes.db")
-        cursor = conn.cursor()
-        
-        cursor.execute("SELECT foto_para_url, foto_pas_url FROM galeria WHERE id = ?", (id,))
-        fotot = cursor.fetchone()
-        if fotot:
-            if fotot[0] and os.path.exists(fotot[0]) and not fotot[0].startswith('http'):
-                os.remove(fotot[0])
-            if fotot[1] and os.path.exists(fotot[1]) and not fotot[1].startswith('http'):
-                os.remove(fotot[1])
-        
-        cursor.execute("DELETE FROM galeria WHERE id = ?", (id,))
-        conn.commit()
-        conn.close()
-        return {"status": "success"}
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+    conn = sqlite3.connect("databaza_klinikes.db")
+    cursor = conn.cursor()
+    cursor.execute("DELETE FROM galeria WHERE id = ?", (id,))
+    conn.commit()
+    conn.close()
+    return {"status": "success"}
 
 @app.post("/api/smile")
 async def shto_smile_assessment(emri: str = Form(...), kontakti: str = Form(...), problemi: str = Form(...), file: Optional[UploadFile] = File(None)):
     foto_url = ""
-    try:
-        if file:
-            filename = f"smile_{datetime.now().strftime('%Y%m%d%H%M%S')}_{file.filename}"
-            file_path = f"uploads/{filename}"
-            with open(file_path, "wb") as buffer:
-                shutil.copyfileobj(file.file, buffer)
-            foto_url = file_path
-            
-        conn = sqlite3.connect("databaza_klinikes.db")
-        cursor = conn.cursor()
-        cursor.execute(
-            "INSERT INTO smile_assessments (emri, kontakti, problemi, foto_url) VALUES (?, ?, ?, ?)",
-            (emri, kontakti, problemi, foto_url)
-        )
-        conn.commit()
-        conn.close()
-        return {"status": "success"}
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+    if file:
+        file_path = f"uploads/smile_{datetime.now().strftime('%Y%m%d%H%M%S')}_{file.filename}"
+        with open(file_path, "wb") as buffer: shutil.copyfileobj(file.file, buffer)
+        foto_url = file_path
+    conn = sqlite3.connect("databaza_klinikes.db")
+    cursor = conn.cursor()
+    cursor.execute("INSERT INTO smile_assessments (emri, kontakti, problemi, foto_url) VALUES (?, ?, ?, ?)", (emri, kontakti, problemi, foto_url))
+    conn.commit()
+    conn.close()
+    return {"status": "success"}
 
 @app.get("/api/smile")
 def merr_smile_assessments():
-    try:
-        conn = sqlite3.connect("databaza_klinikes.db")
-        cursor = conn.cursor()
-        cursor.execute("SELECT id, emri, kontakti, problemi, foto_url, status, data, shqyrtuar_nga FROM smile_assessments ORDER BY data DESC")
-        rreshtat = cursor.fetchall()
-        rezultati = [{"id": r[0], "emri": r[1], "kontakti": r[2], "problemi": r[3], "foto_url": r[4], "status": r[5], "data": r[6], "shqyrtuar_nga": r[7]} for r in rreshtat]
-        conn.close()
-        return rezultati
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+    conn = sqlite3.connect("databaza_klinikes.db")
+    cursor = conn.cursor()
+    cursor.execute("SELECT id, emri, kontakti, problemi, foto_url, status, data, shqyrtuar_nga FROM smile_assessments ORDER BY data DESC")
+    rez = [{"id": r[0], "emri": r[1], "kontakti": r[2], "problemi": r[3], "foto_url": r[4], "status": r[5], "data": r[6], "shqyrtuar_nga": r[7]} for r in cursor.fetchall()]
+    conn.close()
+    return rez
 
 @app.put("/api/smile/{id}/status")
 def ndrysho_status_smile(id: int, form: StatusSmileForm):
-    try:
-        conn = sqlite3.connect("databaza_klinikes.db")
-        cursor = conn.cursor()
-        cursor.execute("UPDATE smile_assessments SET status = ?, shqyrtuar_nga = ? WHERE id = ?", (form.status, form.mjeku, id))
-        conn.commit()
-        conn.close()
-        return {"status": "success"}
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+    conn = sqlite3.connect("databaza_klinikes.db")
+    cursor = conn.cursor()
+    cursor.execute("UPDATE smile_assessments SET status = ?, shqyrtuar_nga = ? WHERE id = ?", (form.status, form.mjeku, id))
+    conn.commit()
+    conn.close()
+    return {"status": "success"}
 
 @app.delete("/api/smile/{id}")
 def fshi_smile_assessment(id: int):
     try:
         conn = sqlite3.connect("databaza_klinikes.db")
         cursor = conn.cursor()
+        
+        # Gjej foton qe ta fshijme fizikisht
         cursor.execute("SELECT foto_url FROM smile_assessments WHERE id = ?", (id,))
         foto = cursor.fetchone()
-        
         if foto and foto[0] and os.path.exists(foto[0]):
             os.remove(foto[0])
             
@@ -539,150 +474,48 @@ def fshi_smile_assessment(id: int):
 
 @app.post("/api/vleresimet")
 def shto_vleresim(form: VleresimForm):
-    try:
-        conn = sqlite3.connect("databaza_klinikes.db")
-        cursor = conn.cursor()
-        cursor.execute(
-            "INSERT INTO vleresimet (emri, komenti, yje) VALUES (?, ?, ?)",
-            (form.emri, form.komenti, form.yje)
-        )
-        conn.commit()
-        conn.close()
-        return {"status": "success"}
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+    conn = sqlite3.connect("databaza_klinikes.db")
+    cursor = conn.cursor()
+    cursor.execute("INSERT INTO vleresimet (emri, komenti, yje) VALUES (?, ?, ?)", (form.emri, form.komenti, form.yje))
+    conn.commit()
+    conn.close()
+    return {"status": "success"}
 
 @app.get("/api/vleresimet/aprovuara")
 def merr_vleresimet_faqe():
-    try:
-        conn = sqlite3.connect("databaza_klinikes.db")
-        cursor = conn.cursor()
-        cursor.execute("SELECT id, emri, komenti, yje, data FROM vleresimet WHERE status = 'E Aprovuar' ORDER BY data DESC")
-        rreshtat = cursor.fetchall()
-        rezultati = [{"id": r[0], "emri": r[1], "komenti": r[2], "yje": r[3], "data": r[4]} for r in rreshtat]
-        conn.close()
-        return rezultati
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+    conn = sqlite3.connect("databaza_klinikes.db")
+    cursor = conn.cursor()
+    cursor.execute("SELECT id, emri, komenti, yje, data FROM vleresimet WHERE status = 'E Aprovuar' ORDER BY data DESC")
+    rez = [{"id": r[0], "emri": r[1], "komenti": r[2], "yje": r[3], "data": r[4]} for r in cursor.fetchall()]
+    conn.close()
+    return rez
 
 @app.get("/api/vleresimet/admin")
 def merr_vleresimet_admin():
-    try:
-        conn = sqlite3.connect("databaza_klinikes.db")
-        cursor = conn.cursor()
-        cursor.execute("SELECT id, emri, komenti, yje, status, data FROM vleresimet ORDER BY data DESC")
-        rreshtat = cursor.fetchall()
-        rezultati = [{"id": r[0], "emri": r[1], "komenti": r[2], "yje": r[3], "status": r[4], "data": r[5]} for r in rreshtat]
-        conn.close()
-        return rezultati
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+    conn = sqlite3.connect("databaza_klinikes.db")
+    cursor = conn.cursor()
+    cursor.execute("SELECT id, emri, komenti, yje, status, data FROM vleresimet ORDER BY data DESC")
+    rez = [{"id": r[0], "emri": r[1], "komenti": r[2], "yje": r[3], "status": r[4], "data": r[5]} for r in cursor.fetchall()]
+    conn.close()
+    return rez
 
 @app.put("/api/vleresimet/{id}/status")
 def ndrysho_status_vleresimi(id: int, form: StatusVleresimiForm):
-    try:
-        conn = sqlite3.connect("databaza_klinikes.db")
-        cursor = conn.cursor()
-        cursor.execute("UPDATE vleresimet SET status = ? WHERE id = ?", (form.status, id))
-        conn.commit()
-        conn.close()
-        return {"status": "success"}
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+    conn = sqlite3.connect("databaza_klinikes.db")
+    cursor = conn.cursor()
+    cursor.execute("UPDATE vleresimet SET status = ? WHERE id = ?", (form.status, id))
+    conn.commit()
+    conn.close()
+    return {"status": "success"}
 
 @app.delete("/api/vleresimet/{id}")
 def fshi_vleresim(id: int):
-    try:
-        conn = sqlite3.connect("databaza_klinikes.db")
-        cursor = conn.cursor()
-        cursor.execute("DELETE FROM vleresimet WHERE id = ?", (id,))
-        conn.commit()
-        conn.close()
-        return {"status": "success"}
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
-
-
-# ==========================================
-# ENDPOINTET E REJA PËR SHPENZIMET & RAPORTET
-# ==========================================
-
-@app.post("/api/shpenzimet")
-def shto_shpenzim(form: ShpenzimForm):
-    try:
-        conn = sqlite3.connect("databaza_klinikes.db")
-        cursor = conn.cursor()
-        cursor.execute(
-            "INSERT INTO shpenzimet (materiali, kompania, cmimi, data) VALUES (?, ?, ?, ?)",
-            (form.materiali, form.kompania, form.cmimi, form.data)
-        )
-        conn.commit()
-        conn.close()
-        return {"status": "success", "message": "Shpenzimi u regjistrua."}
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
-
-@app.get("/api/shpenzimet")
-def merr_shpenzimet():
-    try:
-        conn = sqlite3.connect("databaza_klinikes.db")
-        cursor = conn.cursor()
-        cursor.execute("SELECT id, materiali, kompania, cmimi, data FROM shpenzimet ORDER BY data DESC")
-        rreshtat = cursor.fetchall()
-        rezultati = [{"id": r[0], "materiali": r[1], "kompania": r[2], "cmimi": r[3], "data": r[4]} for r in rreshtat]
-        conn.close()
-        return rezultati
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
-
-@app.delete("/api/shpenzimet/{id}")
-def fshi_shpenzim(id: int):
-    try:
-        conn = sqlite3.connect("databaza_klinikes.db")
-        cursor = conn.cursor()
-        cursor.execute("DELETE FROM shpenzimet WHERE id = ?", (id,))
-        conn.commit()
-        conn.close()
-        return {"status": "success"}
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
-
-@app.get("/api/raporti/{muaji_viti}")
-def gjenero_raport(muaji_viti: str):
-    """
-    muaji_viti duhet të jetë në formatin 'YYYY-MM', p.sh. '2026-08'
-    """
-    try:
-        conn = sqlite3.connect("databaza_klinikes.db")
-        cursor = conn.cursor()
-        
-        # 1. Të Hyrat (Nga rezervimet e përfunduara ku data fillon me YYYY-MM)
-        cursor.execute("""
-            SELECT SUM(cmimi) FROM rezervimet 
-            WHERE status = 'Perfunduar' AND data LIKE ?
-        """, (muaji_viti + "%",))
-        te_hyrat = cursor.fetchone()[0] or 0.0
-        
-        # 2. Shpenzimet (Nga materialet ku data fillon me YYYY-MM)
-        cursor.execute("""
-            SELECT SUM(cmimi) FROM shpenzimet 
-            WHERE data LIKE ?
-        """, (muaji_viti + "%",))
-        shpenzimet = cursor.fetchone()[0] or 0.0
-        
-        conn.close()
-        
-        fitimi_neto = te_hyrat - shpenzimet
-        
-        return {
-            "muaji": muaji_viti,
-            "te_hyrat_pacientet": te_hyrat,
-            "shpenzimet_materiale": shpenzimet,
-            "fitimi_neto": fitimi_neto
-        }
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
-
+    conn = sqlite3.connect("databaza_klinikes.db")
+    cursor = conn.cursor()
+    cursor.execute("DELETE FROM vleresimet WHERE id = ?", (id,))
+    conn.commit()
+    conn.close()
+    return {"status": "success"}
 
 if __name__ == "__main__":
     print("🚀 Serveri po ndizet në https://zen-dental-backend.onrender.com")
