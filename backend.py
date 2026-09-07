@@ -518,5 +518,5 @@ def fshi_vleresim(id: int):
     return {"status": "success"}
 
 if __name__ == "__main__":
-    print("🚀 Serveri po ndizet në https://zen-dental-backend.onrender.com")
+    print("🚀 Serveri po ndizet në https://demodental-1.onrender.com")
     uvicorn.run(app, host="0.0.0.0", port=8000)
