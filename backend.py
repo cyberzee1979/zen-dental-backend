@@ -13,7 +13,7 @@ app = FastAPI()
 
 # === KONFIGURIMI I LLOGARISË SË ADMINISTRATORIT ===
 ADMIN_USERNAME = "admin"
-ADMIN_PASSWORD = "Ferizaj2026$" 
+ADMIN_PASSWORD = "Demo2026" 
 # ==================================================
 
 app.add_middleware(
