@@ -561,7 +561,7 @@
         // ==========================================
         // ADRESA E SERVERIT
         // ==========================================
-        const API_URL = 'http://localhost:8000';
+        const API_URL = 'https://zen-dental-backend.onrender.com';
 
         let galeriaImazheList = [];
         let indeksiImazhitAktual = 0;
@@ -607,6 +607,37 @@
             
             ngarkoMjeket();
             ngarkoVleresimetFaqe();
+            
+            // KJO RRESHT E MBAN MEND FAQEN KU ISHTE PACIENTI PARA REFRESH-IT
+            const faqjaERuajtur = localStorage.getItem('faqjaAktualeZen') || 'faqjaKryesore';
+            ndrroFaqen(faqjaERuajtur);
+        });
+
+        function ndrroFaqen(idEFaqes) {
+            // RUAN FAQEN NË MEMORIEN E BROWSERIT
+            localStorage.setItem('faqjaAktualeZen', idEFaqes);
+
+            document.querySelectorAll('.page-section').forEach(sec => sec.classList.add('hidden'));
+            document.getElementById(idEFaqes).classList.remove('hidden');
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+            
+            const menyte = ['faqjaKryesore', 'kontakt', 'galeria', 'smileAssessment', 'blogu'];
+            menyte.forEach(id => {
+                const btn = document.getElementById('nav-' + id);
+                if (btn) {
+                    if (id === idEFaqes) {
+                        btn.className = "text-green-700 font-bold transition border-b-2 border-green-700 pb-1" + (id === 'smileAssessment' ? " flex items-center" : "");
+                    } else {
+                        btn.className = "text-gray-600 hover:text-green-700 font-medium transition border-b-2 border-transparent pb-1" + (id === 'smileAssessment' ? " flex items-center" : "");
+                    }
+                }
+            });
+            
+            if (idEFaqes === 'kontakt') ngarkoEkipinNgaDatabaza();
+            if (idEFaqes === 'rezervoTermin') ngarkoMjeket();
+            if (idEFaqes === 'galeria') ngarkoGaleria();
+            if (idEFaqes === 'blogu') ngarkoBlogunFaqe(); 
+        }
         });
 
         function ndrroFaqen(idEFaqes) {

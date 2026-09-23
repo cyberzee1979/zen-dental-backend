@@ -183,7 +183,8 @@ async def shto_postim_blogu(titulli: str = Form(...), permbajtja: str = Form(...
     try:
         foto_url = ""
         if file:
-            file_path = f"uploads/blog_{datetime.now().strftime('%Y%m%d%H%M%S')}_{file.filename}"
+            os.makedirs("uploads/blog", exist_ok=True) # Sigurohet që follderi i blogut ekziston
+            file_path = f"uploads/blog/{datetime.now().strftime('%Y%m%d%H%M%S')}_{file.filename}"
             with open(file_path, "wb") as buffer:
                 shutil.copyfileobj(file.file, buffer)
             foto_url = file_path 
@@ -198,17 +199,21 @@ async def shto_postim_blogu(titulli: str = Form(...), permbajtja: str = Form(...
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
-@app.delete("/api/blogu/{id}")
-def fshi_postim_blogu(id: int):
+
+@app.put("/api/blogu/{id}")
+async def ndrysho_postim_blogu(id: int, titulli: str = Form(...), permbajtja: str = Form(...), file: Optional[UploadFile] = File(None)):
     try:
         conn = sqlite3.connect("databaza_klinikes.db")
         cursor = conn.cursor()
-        cursor.execute("SELECT foto_url FROM blogu WHERE id = ?", (id,))
-        foto = cursor.fetchone()
-        if foto and foto[0] and os.path.exists(foto[0]):
-            os.remove(foto[0])
+        if file:
+            os.makedirs("uploads/blog", exist_ok=True) # Sigurohet që follderi i blogut ekziston
+            file_path = f"uploads/blog/{datetime.now().strftime('%Y%m%d%H%M%S')}_{file.filename}"
+            with open(file_path, "wb") as buffer:
+                shutil.copyfileobj(file.file, buffer)
+            cursor.execute("UPDATE blogu SET titulli = ?, permbajtja = ?, foto_url = ? WHERE id = ?", (titulli, permbajtja, file_path, id))
+        else:
+            cursor.execute("UPDATE blogu SET titulli = ?, permbajtja = ? WHERE id = ?", (titulli, permbajtja, id))
             
-        cursor.execute("DELETE FROM blogu WHERE id = ?", (id,))
         conn.commit()
         conn.close()
         return {"status": "success"}
@@ -628,5 +633,5 @@ def fshi_vleresim(id: int):
     return {"status": "success"}
 
 if __name__ == "__main__":
-    print("🚀 Serveri po ndizet në http://localhost:8000")
+    print("🚀 Serveri po ndizet në https://zen-dental-backend.onrender.com")
     uvicorn.run(app, host="0.0.0.0", port=8000)
