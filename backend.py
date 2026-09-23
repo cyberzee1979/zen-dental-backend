@@ -98,6 +98,18 @@ def init_db():
     cursor.execute("""CREATE TABLE IF NOT EXISTS kontratat_keste (id INTEGER PRIMARY KEY AUTOINCREMENT, emri TEXT, telefoni TEXT, numri_personal TEXT, mjeku TEXT, sherbimi TEXT, shuma_totale REAL, data_fillimit TEXT, statusi TEXT DEFAULT 'Aktiv')""")
     cursor.execute("""CREATE TABLE IF NOT EXISTS kestet (id INTEGER PRIMARY KEY AUTOINCREMENT, kontrata_id INTEGER, shuma REAL, data TEXT, data_regjistrimit TIMESTAMP DEFAULT CURRENT_TIMESTAMP, FOREIGN KEY (kontrata_id) REFERENCES kontratat_keste(id))""")
     
+    # Tabela për Blogun
+    cursor.execute("""
+        CREATE TABLE IF NOT EXISTS blogu (
+            id INTEGER PRIMARY KEY AUTOINCREMENT, 
+            titulli TEXT, 
+            permbajtja TEXT, 
+            foto_url TEXT, 
+            autori TEXT, 
+            data_publikimit TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        )
+    """)
+    
     # Migrimet
     try: cursor.execute("ALTER TABLE rezervimet ADD COLUMN status TEXT DEFAULT 'Aktiv'")
     except: pass
@@ -123,6 +135,105 @@ def init_db():
     conn.close()
 
 init_db()
+
+# ================================
+# API PËR NJOFTIMET (BADGES) E RE
+# ================================
+@app.get("/api/njoftimet/{mjeku_emri}")
+def merr_njoftimet(mjeku_emri: str):
+    try:
+        conn = sqlite3.connect("databaza_klinikes.db")
+        cursor = conn.cursor()
+        
+        # Numëro Terminet Aktive
+        if mjeku_emri == "admin" or mjeku_emri == "Çdo Mjek":
+            cursor.execute("SELECT COUNT(*) FROM rezervimet WHERE status = 'Aktiv'")
+        else:
+            cursor.execute("SELECT COUNT(*) FROM rezervimet WHERE (mjeku = ? OR mjeku = 'Çdo Mjek') AND status = 'Aktiv'", (mjeku_emri,))
+        rezervime_aktive = cursor.fetchone()[0]
+        
+        # Numëro Smile Assessments të reja
+        cursor.execute("SELECT COUNT(*) FROM smile_assessments WHERE status = 'E Re'")
+        smile_reja = cursor.fetchone()[0]
+        
+        conn.close()
+        return {"rezervime_aktive": rezervime_aktive, "smile_reja": smile_reja}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+# ================================
+# API PËR BLOGUN (KËSHILLAT)
+# ================================
+@app.get("/api/blogu")
+def merr_blogun():
+    try:
+        conn = sqlite3.connect("databaza_klinikes.db")
+        cursor = conn.cursor()
+        cursor.execute("SELECT id, titulli, permbajtja, foto_url, autori, data_publikimit FROM blogu ORDER BY data_publikimit DESC")
+        rreshtat = cursor.fetchall()
+        rezultati = [{"id": r[0], "titulli": r[1], "permbajtja": r[2], "foto_url": r[3], "autori": r[4], "data_publikimit": r[5]} for r in rreshtat]
+        conn.close()
+        return rezultati
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.post("/api/blogu")
+async def shto_postim_blogu(titulli: str = Form(...), permbajtja: str = Form(...), autori: str = Form(...), file: Optional[UploadFile] = File(None)):
+    try:
+        foto_url = ""
+        if file:
+            file_path = f"uploads/blog_{datetime.now().strftime('%Y%m%d%H%M%S')}_{file.filename}"
+            with open(file_path, "wb") as buffer:
+                shutil.copyfileobj(file.file, buffer)
+            foto_url = file_path 
+            
+        conn = sqlite3.connect("databaza_klinikes.db")
+        cursor = conn.cursor()
+        cursor.execute("INSERT INTO blogu (titulli, permbajtja, foto_url, autori) VALUES (?, ?, ?, ?)", 
+                      (titulli, permbajtja, foto_url, autori))
+        conn.commit()
+        conn.close()
+        return {"status": "success"}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.delete("/api/blogu/{id}")
+def fshi_postim_blogu(id: int):
+    try:
+        conn = sqlite3.connect("databaza_klinikes.db")
+        cursor = conn.cursor()
+        cursor.execute("SELECT foto_url FROM blogu WHERE id = ?", (id,))
+        foto = cursor.fetchone()
+        if foto and foto[0] and os.path.exists(foto[0]):
+            os.remove(foto[0])
+            
+        cursor.execute("DELETE FROM blogu WHERE id = ?", (id,))
+        conn.commit()
+        conn.close()
+        return {"status": "success"}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.put("/api/blogu/{id}")
+async def ndrysho_postim_blogu(id: int, titulli: str = Form(...), permbajtja: str = Form(...), file: Optional[UploadFile] = File(None)):
+    try:
+        conn = sqlite3.connect("databaza_klinikes.db")
+        cursor = conn.cursor()
+        if file:
+            file_path = f"uploads/blog_{datetime.now().strftime('%Y%m%d%H%M%S')}_{file.filename}"
+            with open(file_path, "wb") as buffer:
+                shutil.copyfileobj(file.file, buffer)
+            cursor.execute("UPDATE blogu SET titulli = ?, permbajtja = ?, foto_url = ? WHERE id = ?", (titulli, permbajtja, file_path, id))
+        else:
+            cursor.execute("UPDATE blogu SET titulli = ?, permbajtja = ? WHERE id = ?", (titulli, permbajtja, id))
+            
+        conn.commit()
+        conn.close()
+        return {"status": "success"}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
 
 @app.post("/api/login")
 def kycja(data: LoginData):
@@ -459,7 +570,6 @@ def fshi_smile_assessment(id: int):
         conn = sqlite3.connect("databaza_klinikes.db")
         cursor = conn.cursor()
         
-        # Gjej foton qe ta fshijme fizikisht
         cursor.execute("SELECT foto_url FROM smile_assessments WHERE id = ?", (id,))
         foto = cursor.fetchone()
         if foto and foto[0] and os.path.exists(foto[0]):
@@ -518,5 +628,5 @@ def fshi_vleresim(id: int):
     return {"status": "success"}
 
 if __name__ == "__main__":
-    print("🚀 Serveri po ndizet në https://zen-dental-backend.onrender.com")
+    print("🚀 Serveri po ndizet në http://localhost:8000")
     uvicorn.run(app, host="0.0.0.0", port=8000)
