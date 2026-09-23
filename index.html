@@ -56,7 +56,6 @@
                     <button id="nav-faqjaKryesore" onclick="ndrroFaqen('faqjaKryesore')" class="text-green-700 font-bold transition border-b-2 border-green-700 pb-1">Kryefaqja</button>
                     <button id="nav-kontakt" onclick="ndrroFaqen('kontakt')" class="text-gray-600 hover:text-green-700 font-medium transition border-b-2 border-transparent pb-1">Kontakti & Ekipi</button>
                     <button id="nav-galeria" onclick="ndrroFaqen('galeria')" class="text-gray-600 hover:text-green-700 font-medium transition border-b-2 border-transparent pb-1">Galeria</button>
-                    <!-- Menù e Re për Blogun -->
                     <button id="nav-blogu" onclick="ndrroFaqen('blogu')" class="text-gray-600 hover:text-green-700 font-medium transition border-b-2 border-transparent pb-1">Edukimi i Pacientit</button>
                     <button id="nav-smileAssessment" onclick="ndrroFaqen('smileAssessment')" class="text-gray-600 hover:text-green-700 font-medium transition border-b-2 border-transparent pb-1 flex items-center"><i class="fa-solid fa-wand-magic-sparkles mr-1 text-yellow-500"></i> Smile Assessment</button>
                     <button onclick="ndrroFaqen('rezervoTermin')" class="btn-primary font-medium">Rezervo Termin</button>
@@ -602,50 +601,36 @@
 
         document.addEventListener('DOMContentLoaded', () => {
             const sot = new Date().toISOString().split('T')[0];
-            document.getElementById('data_preferuar').setAttribute('min', sot);
-            document.getElementById('viti-aktual').textContent = new Date().getFullYear();
+            const dp = document.getElementById('data_preferuar');
+            if(dp) dp.setAttribute('min', sot);
             
+            const va = document.getElementById('viti-aktual');
+            if(va) va.textContent = new Date().getFullYear();
+
             ngarkoMjeket();
             ngarkoVleresimetFaqe();
-            
+
             // KJO RRESHT E MBAN MEND FAQEN KU ISHTE PACIENTI PARA REFRESH-IT
             const faqjaERuajtur = localStorage.getItem('faqjaAktualeZen') || 'faqjaKryesore';
             ndrroFaqen(faqjaERuajtur);
         });
 
         function ndrroFaqen(idEFaqes) {
+            // Kontroll sigurie qe mos te bllokohet nese memorizohet keq
+            let seksioniSynuar = document.getElementById(idEFaqes);
+            if (!seksioniSynuar) {
+                idEFaqes = 'faqjaKryesore';
+                seksioniSynuar = document.getElementById('faqjaKryesore');
+            }
+
             // RUAN FAQEN NË MEMORIEN E BROWSERIT
             localStorage.setItem('faqjaAktualeZen', idEFaqes);
 
             document.querySelectorAll('.page-section').forEach(sec => sec.classList.add('hidden'));
-            document.getElementById(idEFaqes).classList.remove('hidden');
+            seksioniSynuar.classList.remove('hidden');
             window.scrollTo({ top: 0, behavior: 'smooth' });
-            
-            const menyte = ['faqjaKryesore', 'kontakt', 'galeria', 'smileAssessment', 'blogu'];
-            menyte.forEach(id => {
-                const btn = document.getElementById('nav-' + id);
-                if (btn) {
-                    if (id === idEFaqes) {
-                        btn.className = "text-green-700 font-bold transition border-b-2 border-green-700 pb-1" + (id === 'smileAssessment' ? " flex items-center" : "");
-                    } else {
-                        btn.className = "text-gray-600 hover:text-green-700 font-medium transition border-b-2 border-transparent pb-1" + (id === 'smileAssessment' ? " flex items-center" : "");
-                    }
-                }
-            });
-            
-            if (idEFaqes === 'kontakt') ngarkoEkipinNgaDatabaza();
-            if (idEFaqes === 'rezervoTermin') ngarkoMjeket();
-            if (idEFaqes === 'galeria') ngarkoGaleria();
-            if (idEFaqes === 'blogu') ngarkoBlogunFaqe(); 
-        }
-        });
 
-        function ndrroFaqen(idEFaqes) {
-            document.querySelectorAll('.page-section').forEach(sec => sec.classList.add('hidden'));
-            document.getElementById(idEFaqes).classList.remove('hidden');
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-            
-            const menyte = ['faqjaKryesore', 'kontakt', 'galeria', 'smileAssessment', 'blogu'];
+            const menyte = ['faqjaKryesore', 'kontakt', 'galeria', 'smileAssessment', 'blogu', 'rezervoTermin'];
             menyte.forEach(id => {
                 const btn = document.getElementById('nav-' + id);
                 if (btn) {
@@ -656,19 +641,19 @@
                     }
                 }
             });
-            
+
             if (idEFaqes === 'kontakt') ngarkoEkipinNgaDatabaza();
             if (idEFaqes === 'rezervoTermin') ngarkoMjeket();
             if (idEFaqes === 'galeria') ngarkoGaleria();
             if (idEFaqes === 'blogu') ngarkoBlogunFaqe(); 
         }
-        
+
         // ==========================================
         // FUNKSIONET E BLOGUT (EDUKIMIT TË PACIENTIT)
         // ==========================================
-        
+
         let teDhenatBloguFaqe = [];
-        
+
         function formatiDates(dataStr) {
             if(!dataStr) return '';
             const p = dataStr.split('-');
@@ -684,23 +669,23 @@
         async function ngarkoBlogunFaqe() {
             const container = document.getElementById('listaBlogutFaqe');
             container.innerHTML = '<div class="col-span-full text-center py-10 text-gray-500"><i class="fa-solid fa-spinner fa-spin text-2xl mb-2"></i><br>Duke ngarkuar këshillat...</div>';
-            
+
             try {
                 const res = await fetch(`${API_URL}/api/blogu`);
                 if (!res.ok) throw new Error();
                 const data = await res.json();
-                
+
                 if (data.length === 0) {
                     container.innerHTML = '<div class="col-span-full text-center text-gray-500 italic">Së shpejti mjekët tanë do të ndajnë këshilla të vlefshme për ju.</div>';
                     return;
                 }
-                
+
                 teDhenatBloguFaqe = data; 
                 container.innerHTML = '';
-                
+
                 data.forEach(item => {
                     const fotoHtml = item.foto_url ? `<img src="${API_URL}/${item.foto_url}" class="w-full h-48 object-cover">` : `<div class="w-full h-48 bg-green-50 flex items-center justify-center text-green-200"><i class="fa-solid fa-tooth text-6xl"></i></div>`;
-                    
+
                     container.innerHTML += `
                         <div class="bg-white rounded-2xl shadow-md border border-gray-100 overflow-hidden hover:-translate-y-1 hover:shadow-lg transition duration-300 flex flex-col cursor-pointer" onclick="hapArtikullinEBlogut(${item.id})">
                             ${fotoHtml}
@@ -720,30 +705,30 @@
                 container.innerHTML = '<div class="col-span-full text-center text-red-500 text-sm">Probleme në ngarkimin e këshillave.</div>';
             }
         }
-        
+
         function hapArtikullinEBlogut(id) {
             const artikulli = teDhenatBloguFaqe.find(a => a.id === id);
             if (!artikulli) return;
-            
+
             document.getElementById('artikullLexoTitulli').textContent = artikulli.titulli;
             document.getElementById('artikullLexoAutori').textContent = artikulli.autori;
             document.getElementById('artikullLexoData').textContent = formatiDates(artikulli.data_publikimit);
             document.getElementById('artikullLexoPermbajtja').textContent = artikulli.permbajtja; 
-            
+
             const fotoContainer = document.getElementById('artikullLexoFotoContainer');
             const fotoImg = document.getElementById('artikullLexoFoto');
-            
+
             if (artikulli.foto_url) {
                 fotoImg.src = `${API_URL}/${artikulli.foto_url}`;
                 fotoContainer.classList.remove('hidden');
             } else {
                 fotoContainer.classList.add('hidden');
             }
-            
+
             document.getElementById('modalLexoArtikull').classList.remove('hidden');
             document.body.style.overflow = 'hidden'; 
         }
-        
+
         function mbyllModalinLexoArtikull() {
             document.getElementById('modalLexoArtikull').classList.add('hidden');
             document.body.style.overflow = 'auto'; 
@@ -752,14 +737,14 @@
         // ==========================================
         // KEYBOARD DHE SWIPE EVENTS PËR GALERINË DHE MODALET
         // ==========================================
-        
+
         function hapLightbox(indeks) {
             indeksiImazhitAktual = indeks;
             const lightbox = document.getElementById('lightbox');
             const img = document.getElementById('lightboxImage');
-            
+
             img.src = galeriaImazheList[indeksiImazhitAktual];
-            
+
             document.getElementById('btnLightboxPara').style.display = indeksiImazhitAktual > 0 ? 'block' : 'none';
             document.getElementById('btnLightboxPas').style.display = indeksiImazhitAktual < galeriaImazheList.length - 1 ? 'block' : 'none';
 
@@ -791,7 +776,7 @@
             if (event.key === 'Escape') {
                 const lightbox = document.getElementById('lightbox');
                 if (lightbox && !lightbox.classList.contains('hidden')) mbyllLightbox();
-                
+
                 const modalBlog = document.getElementById('modalLexoArtikull');
                 if (modalBlog && !modalBlog.classList.contains('hidden')) mbyllModalinLexoArtikull();
 
@@ -1010,7 +995,7 @@
                     alert("Ndodhi një gabim gjatë dërgimit.");
                 }
             } catch (error) {
-                alert("Nuk mund të lidhemi me serverin. Provoni përsëri më vonë.");
+                alert("Nuk mund të lidhemi me serverin. Provoni përsëri mëv onë.");
             }
             btn.innerHTML = originalText;
         }
